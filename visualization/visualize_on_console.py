@@ -5,9 +5,10 @@ SOURCE_FOLDER = "data/LDC2017E02_TAC_KBP_Event_Nugget_Detection_and_Coreference_
 ERE_FOLDER = "data/LDC2017E02_TAC_KBP_Event_Nugget_Detection_and_Coreference_Comprehensive_Training_and_Evaluation_Data_2014-2016/data/2016/eval/eng/nw/ere/"
 ANN_FILELIST = os.listdir(ERE_FOLDER)
 SOURCE_FILELIST = os.listdir(SOURCE_FOLDER)
-ann_filename = os.path.join(ere_folder,ANN_FILELIST[0])
+ann_filename = os.path.join(ERE_FOLDER,ANN_FILELIST[0])
 source_filename = os.path.join(SOURCE_FOLDER,SOURCE_FILELIST[0])
 
+# <span style="color: red">{}</span>
 def visualise_file(ann_filename,source_filename):
     with open(source_filename) as input:
         source = input.read()
@@ -24,4 +25,5 @@ def visualise_file(ann_filename,source_filename):
     print(source)
 
 if __name__ == "__main__":
+
     visualise_file(ann_filename,source_filename)
