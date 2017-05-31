@@ -101,7 +101,7 @@ def load_data_and_labels(vocab):
   one_hot_y = [one_hot[item] for item in y]
   for i in range(len(y)):
     assert one_hot[y[i]].all() == one_hot_y[i].all()
-  return x,y
+  return x,one_hot_y
 
 def load_vocab():
   vocab = []
