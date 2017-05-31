@@ -45,15 +45,15 @@ print("")
 
 # Data Preparation
 # ==================================================
-
-# Load data
-print("Loading data...")
-x_text, y = load_data_and_labels() # FLAGS.data_file
-#import ipdb ; ipdb.set_trace()
 # Build vocabulary
 print("Loading vocab...")
 vocab = load_vocab()
 vocab = set([word.lower() for word in vocab if not word.isalnum()]) # todo fix a better way later
+
+# Load data
+print("Loading data...")
+x_text, y = load_data_and_labels(vocab) # FLAGS.data_file
+#import ipdb ; ipdb.set_trace()
 
 print("Loading w2v...")
 dim, word_vecs = load_bin_vec(vocab) # fname=FLAGS.w2v_file
@@ -67,7 +67,7 @@ print("Starting ...")
 #vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
 #x = np.array(list(vocab_processor.fit_transform(x_text)))
 
-x = np.array(list([word_idx_map[word] for word in x_text if word in word_idx_map]))
+x = np.array(list([word_idx_map[word] for word in x_text ]))
 
 # Randomly shuffle data
 np.random.seed(10)

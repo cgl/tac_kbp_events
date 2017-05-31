@@ -85,13 +85,14 @@ def prepare_datafile(ann_filename,source_filename,datafile):
         vocab[word] += 1
     return vocab
 
-def load_data_and_labels():
+def load_data_and_labels(vocab):
   x,y = [],[]
   with open(DATAFILE,"r") as datafile:
     for line in iter(datafile.readline, ''):
       [word,_,_,subtype] = line.split("\t")
-      x.append(word)
-      y.append(subtype.strip())
+      if word in vocab: # todo should fix unknown words
+        x.append(word)
+        y.append(subtype.strip())
   return x,y
 
 def load_vocab():
