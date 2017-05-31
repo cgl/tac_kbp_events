@@ -94,13 +94,14 @@ def load_data_and_labels(vocab):
         x.append(word)
         y.append(subtype.strip())
   set_y = list(set(y))
-  one_hot = {}
-  for i in range(len(set(y))):
-    one_hot[set_y[i]] = np.zeros(len(set_y))
-    one_hot[set_y[i]][i] = 1
-  one_hot_y = [one_hot[item] for item in y]
-  for i in range(len(y)):
-    assert one_hot[y[i]].all() == one_hot_y[i].all()
+  #one_hot = {}
+  #for i in range(len(set(y))):
+  #  one_hot[set_y[i]] = np.zeros(len(set_y))
+  #  one_hot[set_y[i]][i] = 1
+  #  one_hot_y = [one_hot[item] for item in y]
+  one_hot_y = [set_y.index(item) for item in y]
+  #for i in range(len(y)):
+  #  assert one_hot[y[i]].all() == one_hot_y[i].all()
   return x,one_hot_y
 
 def load_vocab():
