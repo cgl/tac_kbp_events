@@ -14,15 +14,24 @@ def visualise_file(ann_filename,source_filename):
     tree = ElementTree.parse(ann_filename)
     root = tree.getroot()
     offsets = []
-    for trigger in root.findall("hoppers/hopper/event_mention/trigger"):
-        offsets.append((trigger.get('offset'),trigger.get('length')))
+    hoppers = root.find("hoppers")
+    color = 41
+    for hopper in hoppers:
+        event_mentions = hopper.getchildren()
+        for em in event_mentions:
+            trigger = em.find("trigger")
+            id = em.get("id")
+            offsets.append((trigger.get('offset'),trigger.get('length'),color,id))
+        color = color+1 if color < 47 else 41
     sorted_offsets = sorted(offsets,key=lambda x: int(x[0]))
     print(sorted_offsets)
     for index in reversed(range(0,len(sorted_offsets))):
-        offset,length = sorted_offsets[index]
+        offset,length,color,id = sorted_offsets[index]
         offset = int(offset)
         length = int(length)
-        source = source[:offset] + "\033[44;37m[%s]" %index + source[offset:offset+length] + "\033[m" + source[offset+length:]
+        open_tag = "[%s] \033[%s;30m" %(id,color)
+        close_tag = "\033[m"
+        source = source[:offset] + open_tag + source[offset:offset+length] + close_tag + source[offset+length:]
     sys.stdout.write(source.replace("\n\n","\n"))
 
 if __name__ == "__main__":
