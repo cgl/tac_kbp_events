@@ -94,6 +94,7 @@ def load_data_and_labels(vocab):
         x.append(word)
         y.append(subtype.strip())
   set_y = list(set(y))
+  one_hot = {}
   for i in range(len(set(y))):
     one_hot[set_y[i]] = np.zeros(len(set_y))
     one_hot[set_y[i]][i] = 1
