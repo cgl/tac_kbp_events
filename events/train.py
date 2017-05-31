@@ -51,13 +51,16 @@ print("Loading data...")
 x_text, y = load_data_and_labels() # FLAGS.data_file
 #import ipdb ; ipdb.set_trace()
 # Build vocabulary
-
+print("Loading vocab...")
 vocab = load_vocab()
+
+print("Loading w2v...")
 dim, word_vecs = load_bin_vec(FLAGS.w2v_file, vocab)
+print("Loading idx map...")
 W, word_idx_map = get_W(word_vecs)
 
 embeddings = W
-
+print("Starting ...")
 
 #max_document_length = max([len(x.split(" ")) for x in x_text])
 #vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
