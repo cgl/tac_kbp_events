@@ -93,6 +93,13 @@ def load_data_and_labels(vocab):
       if word in vocab: # todo should fix unknown words
         x.append(word)
         y.append(subtype.strip())
+  set_y = list(set(y))
+  for i in range(len(set(y))):
+    one_hot[set_y[i]] = np.zeros(len(set_y))
+    one_hot[set_y[i]][i] = 1
+  one_hot_y = [one_hot[item] for item in y]
+  for i in range(len(y)):
+    assert one_hot[y[i]].all() == one_hot_y[i].all()
   return x,y
 
 def load_vocab():
