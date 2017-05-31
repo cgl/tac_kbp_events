@@ -135,16 +135,11 @@ def embeddings():
   embedding_dim = len(embd[0])
   embedding = np.asarray(embd)
 
-if __name__ == "__main__":
-    response = input("Do you want to change the data folder? (default:%s) [y/N]" % SOURCE_FOLDER)
-    if response is "y":
-        response = input("Enter the directory name of your source files: ")
-        SOURCE_FOLDER = response
-    response = input("Do you want to list folder content? [y/N]: ")
-    list_dir = os.listdir(SOURCE_FOLDER)
-    if response is "y":
-        sys.stdout.write("From the above files,")
-        print("".join(["%d. %s" %(ind,filename) for ind,filename in enumerate(list_dir)]))
+
+def initialize():
+    """
+    Creates datafile and vocab file
+    """
     results = []
     file_index=0
     while file_index < len(list_dir):
@@ -156,13 +151,25 @@ if __name__ == "__main__":
     dimEmb, w2v = load_bin_vec(w2v_file, vocab)
     W1, word_idx_map = get_W(w2v, dimEmb)
 
-
     dictionaries = {}
     dictionaries['word'] = word_idx_map
     embeddings = {}
     embeddings['word'] = W1
     """
-    #prin results
+    #print vocabulary to file
     with open(VOCABFILE,"w") as v_file:
       for key, value in vocab.items():
         v_file.write("%s\t%s\n" % (key,value))
+
+
+if __name__ == "__main__":
+    response = input("Do you want to change the data folder? (default:%s) [y/N]" % SOURCE_FOLDER)
+    if response is "y":
+        response = input("Enter the directory name of your source files: ")
+        SOURCE_FOLDER = response
+    response = input("Do you want to list folder content? [y/N]: ")
+    list_dir = os.listdir(SOURCE_FOLDER)
+    if response is "y":
+        sys.stdout.write("From the above files,")
+        print("".join(["%d. %s" %(ind,filename) for ind,filename in enumerate(list_dir)]))
+    initialize()
