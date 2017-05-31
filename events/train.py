@@ -56,7 +56,7 @@ vocab = load_vocab()
 vocab = set([word.lower() for word in vocab if not word.isalnum()]) # todo fix a better way later
 
 print("Loading w2v...")
-dim, word_vecs = load_bin_vec(FLAGS.w2v_file, vocab)
+dim, word_vecs = load_bin_vec(vocab) # fname=FLAGS.w2v_file
 print("Loading idx map...")
 W, word_idx_map = get_W(word_vecs)
 

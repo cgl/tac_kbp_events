@@ -12,30 +12,17 @@ if not py3:
 vocab = defaultdict(float)
 
 # source: https://github.com/anoperson/jointEE-NN/blob/master/jee_processData.py#L353
-def load_bin_vec(fname, vocab):
+def load_bin_vec(vocab,fname='/datasets/GoogleNews-vectors-negative300.bin'):
     """
     Loads 300x1 word vecs from Google (Mikolov) word2vec
     """
+    from gensim.models.keyedvectors import KeyedVectors
+    model = KeyedVectors.load_word2vec_format(fname, binary=True)
     word_vecs = {}
     dim = 0
-    with open(fname, "rb") as f:
-        header = f.readline()
-        vocab_size, layer1_size = map(int, header.split())
-        binary_len = np.dtype('float32').itemsize * layer1_size
-        for line in range(vocab_size):
-            word = []
-            while True:
-                ch = f.read(1)
-                if ch == ' ':
-                    word = ''.join(word)
-                    break
-                if ch != '\n':
-                    word.append(ch)
-            if word in vocab:
-               word_vecs[word] = np.fromstring(f.read(binary_len), dtype='float32')
-               dim = word_vecs[word].shape[0]
-            else:
-                f.read(binary_len)
+    for word in vocab:
+      word_vecs[word] = model.word_vec("all")
+    dim = word_vecs[word].shape[0]
     print('dim: ', dim)
     return dim, word_vecs
 
