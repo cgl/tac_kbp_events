@@ -142,6 +142,7 @@ def initialize():
     """
     results = []
     file_index=0
+    list_dir = os.listdir(SOURCE_FOLDER)
     while file_index < len(list_dir):
         ann_filename = ANN_FILENAME(file_index)
         source_filename = SOURCE_FILENAME(file_index)
@@ -168,7 +169,6 @@ if __name__ == "__main__":
         response = input("Enter the directory name of your source files: ")
         SOURCE_FOLDER = response
     response = input("Do you want to list folder content? [y/N]: ")
-    list_dir = os.listdir(SOURCE_FOLDER)
     if response is "y":
         sys.stdout.write("From the above files,")
         print("".join(["%d. %s" %(ind,filename) for ind,filename in enumerate(list_dir)]))
