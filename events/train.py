@@ -53,6 +53,7 @@ x_text, y = load_data_and_labels() # FLAGS.data_file
 # Build vocabulary
 print("Loading vocab...")
 vocab = load_vocab()
+vocab = set([word.lower() for word in vocab if not word.isalnum()]) # todo fix a better way later
 
 print("Loading w2v...")
 dim, word_vecs = load_bin_vec(FLAGS.w2v_file, vocab)
