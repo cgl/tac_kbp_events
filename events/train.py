@@ -53,7 +53,6 @@ vocab = set([word.lower() for word in vocab if not word.isalnum()]) # todo fix a
 # Load data
 print("Loading data...")
 x_text, y = load_data_and_labels(vocab) # FLAGS.data_file
-#import ipdb ; ipdb.set_trace()
 
 print("Loading w2v...")
 dim, word_vecs = load_bin_vec(vocab) # fname=FLAGS.w2v_file
@@ -66,7 +65,7 @@ print("Starting ...")
 #max_document_length = max([len(x.split(" ")) for x in x_text])
 #vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
 #x = np.array(list(vocab_processor.fit_transform(x_text)))
-import ipdb ; ipdb.set_trace()
+
 x = np.array(list([W[word_idx_map[word]] for word in x_text ]))
 y = np.array(y)
 # Randomly shuffle data
@@ -189,6 +188,7 @@ with tf.Graph().as_default():
         # Training loop. For each batch...
         for batch in batches:
             x_batch, y_batch = zip(*batch)
+            import ipdb ; ipdb.set_trace()
             train_step(x_batch, y_batch)
             current_step = tf.train.global_step(sess, global_step)
             if current_step % FLAGS.evaluate_every == 0:
