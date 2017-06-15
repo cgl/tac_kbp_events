@@ -5,7 +5,7 @@ import numpy as np
 import os
 import time
 import datetime
-from prepare_datafile import load_data_and_labels,load_vocab, load_bin_vec, get_W
+from prepare_datafile import load_data_and_labels,load_vocab, load_bin_vec, get_W, batch_iter
 from text_cnn import TextCNN
 from tensorflow.contrib import learn
 
