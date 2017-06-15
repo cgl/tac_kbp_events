@@ -68,7 +68,7 @@ print("Starting ...")
 #x = np.array(list(vocab_processor.fit_transform(x_text)))
 
 x = np.array(list([word_idx_map[word] for word in x_text ]))
-
+y = np.array(y)
 # Randomly shuffle data
 np.random.seed(10)
 shuffle_indices = np.random.permutation(np.arange(len(y)))
@@ -80,7 +80,7 @@ y_shuffled = y[shuffle_indices]
 dev_sample_index = -1 * int(FLAGS.dev_sample_percentage * float(len(y)))
 x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
 y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
-print("Vocabulary Size: {:d}".format(len(vocab_processor.vocabulary_)))
+print("Vocabulary Size: {:d}".format(vocab)) #len(vocab_processor.vocabulary_)))
 print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
 
 
