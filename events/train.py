@@ -66,7 +66,7 @@ print("Starting ...")
 #max_document_length = max([len(x.split(" ")) for x in x_text])
 #vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
 #x = np.array(list(vocab_processor.fit_transform(x_text)))
-
+import ipdb ; ipdb.set_trace()
 x = np.array(list([W[word_idx_map[word]] for word in x_text ]))
 y = np.array(y)
 # Randomly shuffle data
@@ -92,7 +92,6 @@ with tf.Graph().as_default():
       allow_soft_placement=FLAGS.allow_soft_placement,
       log_device_placement=FLAGS.log_device_placement)
     sess = tf.Session(config=session_conf)
-    import ipdb ; ipdb.set_trace()
     with sess.as_default():
         cnn = TextCNN(
             sequence_length=x_train.shape[1],
