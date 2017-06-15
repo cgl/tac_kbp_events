@@ -173,7 +173,8 @@ with tf.Graph().as_default():
             feed_dict = {
               cnn.input_x: x_batch,
               cnn.input_y: y_batch,
-              cnn.dropout_keep_prob: 1.0
+              cnn.dropout_keep_prob: 1.0,
+              cnn.embedding_placeholder: embeddings
             }
             step, summaries, loss, accuracy = sess.run(
                 [global_step, dev_summary_op, cnn.loss, cnn.accuracy],
