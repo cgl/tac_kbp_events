@@ -59,7 +59,7 @@ dim, word_vecs = load_bin_vec(vocab) # fname=FLAGS.w2v_file
 print("Loading idx map...")
 W, word_idx_map = get_W(word_vecs)
 
-embeddings = W
+embeddings = W[1:]
 print("Starting ...")
 
 #max_document_length = max([len(x.split(" ")) for x in x_text])
