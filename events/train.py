@@ -152,6 +152,7 @@ with tf.Graph().as_default():
             """
             A single training step
             """
+            #import ipdb ; ipdb.set_trace()
             feed_dict = {
                 cnn.input_x: x_batch,
                 cnn.input_y: y_batch,
@@ -188,7 +189,6 @@ with tf.Graph().as_default():
         # Training loop. For each batch...
         for batch in batches:
             x_batch, y_batch = zip(*batch)
-            import ipdb ; ipdb.set_trace()
             train_step(x_batch, y_batch)
             current_step = tf.train.global_step(sess, global_step)
             if current_step % FLAGS.evaluate_every == 0:
