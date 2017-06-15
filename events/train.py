@@ -67,7 +67,7 @@ print("Starting ...")
 #vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
 #x = np.array(list(vocab_processor.fit_transform(x_text)))
 
-x = np.array(list([word_idx_map[word] for word in x_text ]))
+x = np.array(list(W[word_idx_map[word]] for word in x_text ]))
 y = np.array(y)
 # Randomly shuffle data
 np.random.seed(10)
