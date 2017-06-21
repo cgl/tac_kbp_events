@@ -88,7 +88,7 @@ def prepare_datafile(ann_filename,source_filename,datafile):
 def prepare_test_data(datafile):
     results = []
     file_index = 0
-    vocab = defaultdict(float)
+    #vocab = defaultdict(float)
 
     project_folder = os.path.abspath(os.path.join(os.path.abspath(os.curdir), os.pardir))
     source_folder = os.path.join(project_folder,"data/LDC2017E02/data/2016/eval/eng/df/source/")
