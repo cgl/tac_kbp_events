@@ -22,7 +22,7 @@ def load_bin_vec(vocab,fname='/datasets/GoogleNews-vectors-negative300.bin'):
     dim = 0
     for word in vocab:
       word_vecs[word] = model.word_vec("all")
-    dim = word_vecs[word].shape[0]
+      dim = word_vecs[word].shape[0]
     print('dim: ', dim)
     return dim, word_vecs
 
