@@ -85,10 +85,35 @@ def prepare_datafile(ann_filename,source_filename,datafile):
         vocab[word] += 1
     return vocab
 
-def load_data_and_labels(vocab):
+def prepare_test_data(datafile):
+    results = []
+    file_index = 0
+    vocab = defaultdict(float)
+
+    project_folder = os.path.abspath(os.path.join(os.path.abspath(os.curdir), os.pardir))
+    source_folder = os.path.join(project_folder,"data/LDC2017E02/data/2016/eval/eng/df/source/")
+    ere_folder = os.path.join(project_folder,"data/LDC2017E02/data/2016/eval/eng/df/ere/")
+    print(ere_folder)
+    import ipdb ; ipdb.set_trace()
+    ann_filelist = os.listdir(ere_folder)
+    source_filelist = os.listdir(source_folder)
+    ann_filename_fun = lambda x:  os.path.join(ere_folder,ann_filelist[x])
+    source_filename_fun = lambda x:  os.path.join(source_folder,source_filelist[x])
+
+
+    list_dir = os.listdir(source_folder)
+    while file_index < len(list_dir):
+        ann_filename = ann_filename_fun(file_index)
+        source_filename = source_filename_fun(file_index)
+        prepare_datafile(ann_filename,source_filename,datafile)
+        file_index += 1
+    return vocab
+
+
+def load_data_and_labels(vocab,datafile=DATAFILE):
   x,y = [],[]
-  with open(DATAFILE,"r") as datafile:
-    for line in iter(datafile.readline, ''):
+  with open(datafile,"r") as df:
+    for line in iter(df.readline, ''):
       [word,_,_,subtype] = line.split("\t")
       if word in vocab: # todo should fix unknown words
         x.append(word)
@@ -161,6 +186,7 @@ def initialize():
     results = []
     file_index=0
     list_dir = os.listdir(SOURCE_FOLDER)
+
     while file_index < len(list_dir):
         ann_filename = ANN_FILENAME(file_index)
         source_filename = SOURCE_FILENAME(file_index)
