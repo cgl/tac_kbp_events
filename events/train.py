@@ -60,7 +60,7 @@ print("Loading idx map...")
 W, word_idx_map = get_W(word_vecs)
 
 embeddings = W[1:]
-pickle.dump(embeddings,"embeddings.pck")
+pickle.dump(embeddings,open("embeddings.pck","wb"))
 print("Starting ...")
 
 #max_document_length = max([len(x.split(" ")) for x in x_text])

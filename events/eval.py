@@ -49,7 +49,7 @@ print("Loading w2v...")
 dim, word_vecs = load_bin_vec(vocab) # fname=FLAGS.w2v_file
 print("Loading idx map...")
 W, word_idx_map = get_W(word_vecs)
-embeddings = pickle.load("embeddings.pck")
+embeddings = pickle.load(open("embeddings.pck","rb"))
 #embeddings = W[1:]
 print("Starting ...")
 
