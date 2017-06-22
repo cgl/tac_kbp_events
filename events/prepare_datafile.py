@@ -109,27 +109,28 @@ def prepare_test_data(datafile):
 
 
 def load_data_and_labels(vocab,datafile=DATAFILE):
-  x,y = [],[]
+  x,y_text = [],[]
   with open(datafile,"r") as df:
     for line in iter(df.readline, ''):
       [word,_,_,subtype] = line.split("\t")
       if word in vocab: # todo should fix unknown words
         x.append(word)
-        y.append(subtype.strip())
+        y_text.append(subtype.strip())
+  set_y = list(set(y_text))
+  y = [set_y.index(item) for item in y_text]
 
   #for i in range(len(y)):
   #  assert one_hot[y[i]].all() == one_hot_y[i].all()
   return x,y
 
 def get_one_hot(y):
-  set_y = list(set(y))
   #one_hot = {}
   #for i in range(len(set(y))):
   #  one_hot[set_y[i]] = np.zeros(len(set_y))
   #  one_hot[set_y[i]][i] = 1
   #  one_hot_y = [one_hot[item] for item in y]
   identity = np.identity(16)
-  one_hot_y = [identity[set_y.index(item)] for item in y]
+  one_hot_y = [identity[item] for item in y]
   return one_hot_y
 
 
