@@ -4,7 +4,7 @@
 
 import tensorflow as tf
 import numpy as np
-import os
+import os, pickle
 import time
 import datetime
 from text_cnn import TextCNN
@@ -49,8 +49,8 @@ print("Loading w2v...")
 dim, word_vecs = load_bin_vec(vocab) # fname=FLAGS.w2v_file
 print("Loading idx map...")
 W, word_idx_map = get_W(word_vecs)
-
-embeddings = W[1:]
+embeddings = pickle.load("embeddings.pck")
+#embeddings = W[1:]
 print("Starting ...")
 
 #max_document_length = max([len(x.split(" ")) for x in x_text])
@@ -82,6 +82,8 @@ with graph.as_default():
         # input_y = graph.get_operation_by_name("input_y").outputs[0]
         dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
 
+        embedding_placeholder = graph.get_operation_by_name("embedding/Placeholder").outputs[0]
+
         # Tensors we want to evaluate
         predictions = graph.get_operation_by_name("output/predictions").outputs[0]
 
@@ -92,7 +94,8 @@ with graph.as_default():
         all_predictions = []
 
         for x_test_batch in batches:
-            batch_predictions = sess.run(predictions, {input_x: x_test_batch, dropout_keep_prob: 1.0})
+            batch_predictions = sess.run(predictions, {input_x: x_test_batch, dropout_keep_prob: 1.0,
+                                                       embedding_placeholder: embeddings })
             all_predictions = np.concatenate([all_predictions, batch_predictions])
 
 # Print accuracy if y_test is defined

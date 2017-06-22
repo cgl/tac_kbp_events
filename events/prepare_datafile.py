@@ -93,8 +93,6 @@ def prepare_test_data(datafile):
     project_folder = os.path.abspath(os.path.join(os.path.abspath(os.curdir), os.pardir))
     source_folder = os.path.join(project_folder,"data/LDC2017E02/data/2016/eval/eng/df/source/")
     ere_folder = os.path.join(project_folder,"data/LDC2017E02/data/2016/eval/eng/df/ere/")
-    print(ere_folder)
-    import ipdb ; ipdb.set_trace()
     ann_filelist = os.listdir(ere_folder)
     source_filelist = os.listdir(source_folder)
     ann_filename_fun = lambda x:  os.path.join(ere_folder,ann_filelist[x])

@@ -2,7 +2,7 @@
 
 import tensorflow as tf
 import numpy as np
-import os
+import os, pickle
 import time
 import datetime
 from prepare_datafile import load_data_and_labels,load_vocab, load_bin_vec, get_W, batch_iter
@@ -14,7 +14,7 @@ from tensorflow.contrib import learn
 
 # Data loading params
 tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training data to use for validation")
-tf.flags.DEFINE_string("data_file", "./data/rt-polaritydata/rt-polarity.pos", "Data source for the positive data.")
+#tf.flags.DEFINE_string("data_file", "./data/rt-polaritydata/rt-polarity.pos", "Data source for the positive data.")
 tf.flags.DEFINE_string("w2v_file", "../data/GoogleNews-vectors-negative300.bin", "w2v file.")
 
 
@@ -60,6 +60,7 @@ print("Loading idx map...")
 W, word_idx_map = get_W(word_vecs)
 
 embeddings = W[1:]
+pickle.dump(embeddings,"embeddings.pck")
 print("Starting ...")
 
 #max_document_length = max([len(x.split(" ")) for x in x_text])
