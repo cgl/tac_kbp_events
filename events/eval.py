@@ -58,7 +58,7 @@ print("Starting ...")
 #x = np.array(list(vocab_processor.fit_transform(x_text)))
 
 x_test = np.array(list([W[word_idx_map[word]] for word in x_text ]))
-y_test = np.array(y_one_hot)
+y_test = np.argmax(y_one_hot,1) #np.array(y_one_hot)
 
 
 print("\nEvaluating...\n")
@@ -86,6 +86,7 @@ with graph.as_default():
 
         # Tensors we want to evaluate
         predictions = graph.get_operation_by_name("output/predictions").outputs[0]
+        scores = graph.get_operation_by_name("output/scores").outputs[0]
 
         # Generate batches for one epoch
         batches = batch_iter(list(x_test), FLAGS.batch_size, 1, shuffle=False)
@@ -94,7 +95,7 @@ with graph.as_default():
         all_predictions = []
 
         for x_test_batch in batches:
-            batch_predictions = sess.run(predictions, {input_x: x_test_batch, dropout_keep_prob: 1.0,
+            batch_predictions,scores = sess.run([predictions,scores], {input_x: x_test_batch, dropout_keep_prob: 1.0,
                                                        embedding_placeholder: embeddings })
             all_predictions = np.concatenate([all_predictions, batch_predictions])
 
