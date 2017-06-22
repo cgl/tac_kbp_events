@@ -116,6 +116,12 @@ def load_data_and_labels(vocab,datafile=DATAFILE):
       if word in vocab: # todo should fix unknown words
         x.append(word)
         y.append(subtype.strip())
+
+  #for i in range(len(y)):
+  #  assert one_hot[y[i]].all() == one_hot_y[i].all()
+  return x,y
+
+def get_one_hot(y):
   set_y = list(set(y))
   #one_hot = {}
   #for i in range(len(set(y))):
@@ -124,10 +130,8 @@ def load_data_and_labels(vocab,datafile=DATAFILE):
   #  one_hot_y = [one_hot[item] for item in y]
   identity = np.identity(16)
   one_hot_y = [identity[set_y.index(item)] for item in y]
+  return one_hot_y
 
-  #for i in range(len(y)):
-  #  assert one_hot[y[i]].all() == one_hot_y[i].all()
-  return x,one_hot_y
 
 def load_vocab():
   vocab = []

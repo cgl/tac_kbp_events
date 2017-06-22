@@ -43,7 +43,7 @@ project_folder = os.path.abspath(os.path.join(os.path.abspath(os.curdir), os.par
 test_datafile = os.path.join(project_folder,"data/datafile_test.txt")
 vocab = prepare_test_data(test_datafile)
 vocab = set([word.lower() for word in vocab if not word.isalnum()]) # todo fix a better way later
-x_text, y_one_hot = load_data_and_labels(vocab,datafile=test_datafile)
+x_text, y = load_data_and_labels(vocab,datafile=test_datafile)
 
 print("Loading w2v...")
 dim, word_vecs = load_bin_vec(vocab) # fname=FLAGS.w2v_file
@@ -58,8 +58,8 @@ print("Starting ...")
 #x = np.array(list(vocab_processor.fit_transform(x_text)))
 
 x_test = np.array(list([W[word_idx_map[word]] for word in x_text ]))
-y_test = np.argmax(np.array(y_one_hot),1)
-
+y_test = np.array(y)
+import ipdb ; ipdb.set_trace()
 
 print("\nEvaluating...\n")
 
@@ -98,7 +98,7 @@ with graph.as_default():
             batch_predictions,scores = sess.run([predictions,scores], {input_x: x_test_batch, dropout_keep_prob: 1.0,
                                                        embedding_placeholder: embeddings })
             all_predictions = np.concatenate([all_predictions, batch_predictions])
-
+import ipdb ; ipdb.set_trace()
 # Print accuracy if y_test is defined
 if y_test is not None:
     correct_predictions = float(sum(all_predictions == y_test))

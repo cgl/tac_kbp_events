@@ -53,7 +53,7 @@ vocab = set([word.lower() for word in vocab if not word.isalnum()]) # todo fix a
 # Load data
 print("Loading data...")
 x_text, y = load_data_and_labels(vocab) # FLAGS.data_file
-
+y_one_hot = get_one_hot(y)
 print("Loading w2v...")
 dim, word_vecs = load_bin_vec(vocab) # fname=FLAGS.w2v_file
 print("Loading idx map...")
@@ -68,7 +68,7 @@ print("Starting ...")
 #x = np.array(list(vocab_processor.fit_transform(x_text)))
 
 x = np.array(list([W[word_idx_map[word]] for word in x_text ]))
-y = np.array(y)
+y = np.array(y_one_hot)
 # Randomly shuffle data
 np.random.seed(10)
 shuffle_indices = np.random.permutation(np.arange(len(y)))
