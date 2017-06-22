@@ -58,7 +58,7 @@ print("Starting ...")
 #x = np.array(list(vocab_processor.fit_transform(x_text)))
 
 x_test = np.array(list([W[word_idx_map[word]] for word in x_text ]))
-y_test = np.argmax(y_one_hot,1) #np.array(y_one_hot)
+y_test = np.argmax(np.array(y_one_hot),1)
 
 
 print("\nEvaluating...\n")
