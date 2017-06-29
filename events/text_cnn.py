@@ -24,11 +24,9 @@ class TextCNN(object):
             self.W = tf.Variable(tf.constant(0.0, shape=[vocab_size, embedding_size]),
                 trainable=False, name="W") # trainable=finetune
 
-            self.embedding_placeholder = tf.placeholder(tf.float32, [vocab_size, embedding_size])
+            self.embedding_placeholder = tf.placeholder(tf.float32, [vocab_size, embedding_size], name="embeddings")
             self.embedding_init = self.W.assign(self.embedding_placeholder)
             #sess.run(embedding_init, feed_dict={embedding_placeholder: embedding})
-
-
 
             #self.W = tf.Variable(tf.random_uniform([vocab_size, embedding_size], -1.0, 1.0),name="W")
             #self.embedded_chars = tf.nn.embedding_lookup(self.W, self.input_x)
