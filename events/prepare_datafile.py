@@ -199,13 +199,13 @@ class Dataset(object):
                                              test[1].count(i),test[1].count(i)/len(test[1]),
                                              self.label_set[i]))
 
-def get_one_hot(y):
+def get_one_hot(y,label_count):
         #one_hot = {}
         #for i in range(len(set(y))):
         #  one_hot[set_y[i]] = np.zeros(len(set_y))
         #  one_hot[set_y[i]][i] = 1
         #  one_hot_y = [one_hot[item] for item in y]
-        identity = np.identity(16)
+        identity = np.identity(label_count)
         one_hot_y = [identity[item] for item in y]
         return one_hot_y
 
