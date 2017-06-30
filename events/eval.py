@@ -87,7 +87,7 @@ with graph.as_default():
         # input_y = graph.get_operation_by_name("input_y").outputs[0]
         dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
 
-        embedding_placeholder = graph.get_operation_by_name("embedding/Placeholder").outputs[0]
+        embedding_placeholder = graph.get_operation_by_name("embeddings").outputs[0]
 
         # Tensors we want to evaluate
         predictions = graph.get_operation_by_name("output/predictions").outputs[0]
