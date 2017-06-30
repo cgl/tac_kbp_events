@@ -65,7 +65,7 @@ class Dataset(object):
     training_dataset_file = os.path.join(project_folder,"data/dataset_file_training.txt")
     test_dataset_file =  os.path.join(project_folder,"data/dataset_file_test.txt")
     vocab = defaultdict(float)
-    self.vocab_filename = os.path.join(project_folder,"data/vocab.txt")
+    vocab_filename = os.path.join(project_folder,"data/vocab.txt")
     training_set, test_set = None, None
     label_set = ['None','broadcast', 'injure', 'transportperson', 'transfermoney', 'artifact', 'contact',
                  'elect', 'correspondence', 'startposition', 'transportartifact', 'demonstrate', 'arrestjail',
