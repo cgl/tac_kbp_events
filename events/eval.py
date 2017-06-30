@@ -54,8 +54,8 @@ print("Loading w2v...")
 dim, word_vecs = load_bin_vec(vocab) # fname=FLAGS.w2v_file
 print("Loading idx map...")
 W, word_idx_map = get_W(word_vecs)
-embeddings = pickle.load(open("embeddings.pck","rb"))
-#embeddings = W[1:]
+#embeddings = pickle.load(open("embeddings.pck","rb"))
+embeddings = W[1:]
 print("Starting ...")
 
 #max_document_length = max([len(x.split(" ")) for x in x_text])

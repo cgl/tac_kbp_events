@@ -77,9 +77,10 @@ class Dataset(object):
         if test_dataset_file:
             self.test_dataset_file = test_dataset_file
 
-    def process(self):
-        self.prepare_dataset_file(self.training_dataset_file,self.training_source_folder, self.training_ann_folder)
-        self.prepare_dataset_file(self.test_dataset_file,self.test_source_folder, self.test_ann_folder)
+    def process(self,dataset_files_exist=True):
+        if not dataset_files_exist:
+            self.prepare_dataset_file(self.training_dataset_file,self.training_source_folder, self.training_ann_folder)
+            self.prepare_dataset_file(self.test_dataset_file,self.test_source_folder, self.test_ann_folder)
         self.build_dataset()
         self.show_label_percentage()
 
