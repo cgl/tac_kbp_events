@@ -11,6 +11,7 @@ if not py3:
     input = raw_input
 
 # source: https://github.com/anoperson/jointEE-NN/blob/master/jee_processData.py#L353
+# '../data/GoogleNews-vectors-negative300.bin'
 def load_bin_vec(vocab,fname='/datasets/GoogleNews-vectors-negative300.bin'):
     """
     Loads 300x1 word vecs from Google (Mikolov) word2vec

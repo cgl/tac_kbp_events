@@ -5,7 +5,7 @@ import numpy as np
 import os, pickle
 import time
 import datetime
-from prepare_datafile import load_data_and_labels,load_vocab, load_bin_vec, get_W, batch_iter
+from prepare_datafile import Dataset, load_bin_vec, get_W, batch_iter, get_one_hot
 from text_cnn import TextCNN
 from tensorflow.contrib import learn
 
@@ -45,22 +45,29 @@ print("")
 
 # Data Preparation
 # ==================================================
-# Build vocabulary
-print("Loading vocab...")
-vocab = load_vocab()
-vocab = set([word.lower() for word in vocab if not word.isalnum()]) # todo fix a better way later
 
 # Load data
 print("Loading data...")
-x_text, y = load_data_and_labels(vocab) # FLAGS.data_file
-y_one_hot = get_one_hot(y)
+# x_text, y = load_data_and_labels(vocab) # FLAGS.data_file
+
+dt = Dataset() ; dt.process()
+x_text, y, _ = dt.training_set
+
+# Build vocabulary
+print("Loading vocab...")
+#vocab = load_vocab()
+#vocab = set([word.lower() for word in vocab if not word.isalnum()]) # todo fix a better way later
+vocab = dt.vocab
+
+y_one_hot = get_one_hot(y,len(dt.label_set))
 print("Loading w2v...")
 dim, word_vecs = load_bin_vec(vocab) # fname=FLAGS.w2v_file
 print("Loading idx map...")
 W, word_idx_map = get_W(word_vecs)
 
 embeddings = W[1:]
-#pickle.dump(embeddings,open("embeddings.pck","wb"))
+pickle.dump(embeddings,open("embeddings.pck","wb"))
+
 print("Starting ...")
 
 #max_document_length = max([len(x.split(" ")) for x in x_text])

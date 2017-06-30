@@ -11,7 +11,7 @@ from text_cnn import TextCNN
 from tensorflow.contrib import learn
 import csv
 
-from prepare_datafile import load_data_and_labels, prepare_test_data,  load_bin_vec, get_W, batch_iter
+from prepare_datafile import Dataset, load_bin_vec, get_W, batch_iter
 
 # Parameters
 # ==================================================
@@ -39,11 +39,16 @@ for attr, value in sorted(FLAGS.__flags.items()):
 print("")
 
 # Load data
+"""
 project_folder = os.path.abspath(os.path.join(os.path.abspath(os.curdir), os.pardir))
 test_datafile = os.path.join(project_folder,"data/datafile_test.txt")
 vocab = prepare_test_data(test_datafile)
 vocab = set([word.lower() for word in vocab if not word.isalnum()]) # todo fix a better way later
 x_text, y = load_data_and_labels(vocab,datafile=test_datafile)
+"""
+dt = Dataset() ; dt.process()
+x_text, y, _ = dt.test_set
+vocab = dt.vocab
 
 print("Loading w2v...")
 dim, word_vecs = load_bin_vec(vocab) # fname=FLAGS.w2v_file
