@@ -104,7 +104,7 @@ class Dataset(object):
                 v_file.write("%s\t%s\n" % (key,value))
 
     def read_vocab(self,vocab_filename):
-        with open(vocab_filename,"w") as v_file:
+        with open(vocab_filename,"r") as v_file:
             for line in iter(v_file.readline, ''):
                 [word,_] = line.split("\t")
                 self.vocab.append(word)
