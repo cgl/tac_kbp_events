@@ -82,9 +82,9 @@ class Dataset(object):
         if not dataset_files_exist:
             self.prepare_dataset_file(self.training_dataset_file,self.training_source_folder, self.training_ann_folder)
             self.prepare_dataset_file(self.test_dataset_file,self.test_source_folder, self.test_ann_folder)
-            self.write_vocab(self,self.vocab_filename)
+            self.write_vocab(self.vocab_filename)
         else:
-            self.read_vocab(self,self.vocab_filename)
+            self.read_vocab(self.vocab_filename)
         self.build_dataset()
         self.show_label_percentage()
 
