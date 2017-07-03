@@ -86,11 +86,6 @@ with graph.as_default():
         saver = tf.train.import_meta_graph("{}.meta".format(checkpoint_file))
         saver.restore(sess, checkpoint_file)
 
-        #######
-        embedding_saver = tf.train.Saver({"W": W})
-        embedding_saver.restore(sess, checkpoint_file)
-        #######
-
         # Get the placeholders from the graph by name
         input_x = graph.get_operation_by_name("input_x").outputs[0]
         # input_y = graph.get_operation_by_name("input_y").outputs[0]
