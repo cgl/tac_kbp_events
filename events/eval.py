@@ -50,12 +50,15 @@ dt = Dataset() ; dt.process()
 x_text, y, _ = dt.test_set
 vocab = dt.vocab
 
+"""
 print("Loading w2v...")
 dim, word_vecs = load_bin_vec(vocab) # fname=FLAGS.w2v_file
 print("Loading idx map...")
 W, word_idx_map = get_W(word_vecs)
 #embeddings = pickle.load(open("embeddings.pck","rb"))
 embeddings = W[1:]
+"""
+
 print("Starting ...")
 
 #max_document_length = max([len(x.split(" ")) for x in x_text])
@@ -82,12 +85,17 @@ with graph.as_default():
         saver = tf.train.import_meta_graph("{}.meta".format(checkpoint_file))
         saver.restore(sess, checkpoint_file)
 
+        #######
+        embedding_saver = tf.train.Saver({"W": W})
+        embedding_saver.restore(sess, checkpoint_file)
+        #######
+
         # Get the placeholders from the graph by name
         input_x = graph.get_operation_by_name("input_x").outputs[0]
         # input_y = graph.get_operation_by_name("input_y").outputs[0]
         dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
 
-        embedding_placeholder = graph.get_operation_by_name("embeddings").outputs[0]
+        #embedding_placeholder = graph.get_operation_by_name("embeddings").outputs[0]
 
         # Tensors we want to evaluate
         predictions = graph.get_operation_by_name("output/predictions").outputs[0]
@@ -101,7 +109,8 @@ with graph.as_default():
 
         for x_test_batch in batches:
             batch_predictions,scores = sess.run([predictions,scores], {input_x: x_test_batch, dropout_keep_prob: 1.0,
-                                                       embedding_placeholder: embeddings })
+                                                       #embedding_placeholder: embeddings
+            })
             all_predictions = np.concatenate([all_predictions, batch_predictions])
 import ipdb ; ipdb.set_trace()
 # Print accuracy if y_test is defined
