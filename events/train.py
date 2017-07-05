@@ -55,10 +55,10 @@ dt = Dataset()
 if False: # set to True to work with only one dataset
     dt.process()
 else:
-    dt.prepare_dataset_file(self.training_dataset_file,self.training_source_folder, self.training_ann_folder)
+    dt.prepare_dataset_file(dt.training_dataset_file,dt.training_source_folder, dt.training_ann_folder)
     # add second dataset as well
-    dt.prepare_dataset_file(self.training_dataset_file,self.test_source_folder, self.test_ann_folder,append=True)
-    dt.write_vocab(self.vocab_filename)
+    dt.prepare_dataset_file(dt.training_dataset_file,dt.test_source_folder, dt.test_ann_folder,append=True)
+    dt.write_vocab(dt.vocab_filename)
     dt.build_dataset()
     dt.show_label_percentage()
 
