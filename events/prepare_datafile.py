@@ -153,16 +153,18 @@ class Dataset(object):
 
     # writes dataset to file
     def prepare_dataset_file(self,dataset_file,
-                          source_folder=os.path.join(PROJECT_FOLDER,"data/LDC2017E02/data/2016/eval/eng/df/source/"),
-                          ere_folder = os.path.join(PROJECT_FOLDER,"data/LDC2017E02/data/2016/eval/eng/df/ere/")):
+                             source_folder=os.path.join(PROJECT_FOLDER,"data/LDC2017E02/data/2016/eval/eng/df/source/"),
+                             ere_folder = os.path.join(PROJECT_FOLDER,"data/LDC2017E02/data/2016/eval/eng/df/ere/"),
+                             append=False):
         """
         Takes source folder, annotation folder and dataset file to write the data as arguments.
         Reads dataset from source and annotation folder and writes the data to dataset file.
         """
-        try:
-            os.remove(dataset_file)
-        except FileNotFoundError:
-            pass
+        if not append:
+            try:
+                os.remove(dataset_file)
+            except FileNotFoundError:
+                pass
         file_index = 0
         ann_filelist = os.listdir(ere_folder)
         source_filelist = os.listdir(source_folder)
