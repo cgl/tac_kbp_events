@@ -84,8 +84,8 @@ print("Starting ...")
 #max_document_length = max([len(x.split(" ")) for x in x_text])
 #vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
 #x = np.array(list(vocab_processor.fit_transform(x_text)))
-
-x = np.array(list([W[word_idx_map[word]] for word in x_text ]))
+#import ipdb ; ipdb.set_trace()
+x = np.array(list([np.concatenate([W[word_idx_map[word]] for word in word_list]) for word_list in x_text ]))
 y = np.array(y_one_hot)
 # Randomly shuffle data
 np.random.seed(10)

@@ -70,6 +70,7 @@ class Dataset(object):
     label_set = ['None','broadcast', 'injure', 'transportperson', 'transfermoney', 'artifact', 'contact',
                  'elect', 'correspondence', 'startposition', 'transportartifact', 'demonstrate', 'arrestjail',
                  'meet', 'transferownership', 'transaction', 'die', 'attack', 'endposition']
+    window_size = 3
     def __init__(self, vocab_filename=None,training_dataset_file=None,test_dataset_file=None):
         if vocab_filename:
             read_vocab(self,vocab_filename)
@@ -187,10 +188,11 @@ class Dataset(object):
                 [word,_,_,subtype] = line.split("\t")
                 if word in self.vocab: # todo should fix unknown words
                     dataset.append((word,subtype.strip()))
-
-        for line in dataset:
+        for i in range(len(dataset)):
+            line = dataset[i]
             if line[1] != 'None' or random.random() < 0.002:
-                x.append(line[0])
+                x.append([a[0] if a[0] in self.vocab else "" for a in dataset[i-self.window_size:i+self.window_size+1]])
+                #x.append(line[0])
                 y_text.append(line[1])
 
         y = [self.label_set.index(item) for item in y_text]
