@@ -1,3 +1,5 @@
 numpy
 nltk
 gensim
+sklearn
+#pandas
