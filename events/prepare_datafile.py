@@ -56,6 +56,34 @@ def tokenize_with_span(source_str):
         yield token
         assert token[0]==source_str[token[1]:token[2]]
 
+class Vocabulary(object):
+    vocab = defaultdict(float)
+    vocab_filename = os.path.join(PROJECT_FOLDER,"data/vocab.txt")
+
+    def write_vocab(self):
+        with open(self,self.vocab_filename,"w") as v_file:
+            for key, value in self.vocab.items():
+                v_file.write("%s\t%s\n" % (key,value))
+
+    def read_vocab(self):
+        self.vocab = []
+        with open(self.vocab_filename,"r") as v_file:
+            for line in iter(v_file.readline, ''):
+                [word,_] = line.split("\t")
+                self.vocab.append(word)
+    def update_vocab(self,source_filename):
+        import ipdb ; ipdb.set_trace()
+        tree = ElementTree.parse(source_filename)
+        root = tree.getroot()
+        for child in root.getchildren():
+            #print(child.text.strip())
+            for par in child.text.strip().split("\n"):
+                if par:
+                    sentences = sent_tokenize(par)
+                    for sent in sentences:
+                        words = word_tokenize(sent)
+                        for word in words:
+                            self.vocab[word] += 1
 class Dataset(object):
     project_folder = PROJECT_FOLDER
     training_source_folder = os.path.join(project_folder,"data/LDC2017E02/data/2016/eval/eng/nw/source/")
@@ -64,8 +92,9 @@ class Dataset(object):
     test_ann_folder = os.path.join(project_folder,"data/LDC2017E02/data/2016/eval/eng/df/ere/")
     training_dataset_file = os.path.join(project_folder,"data/dataset_file_training.txt")
     test_dataset_file =  os.path.join(project_folder,"data/dataset_file_test.txt")
-    vocab = defaultdict(float)
-    vocab_filename = os.path.join(project_folder,"data/vocab.txt")
+    vocab_obj = Vocabulary()
+    vocab = vocab_obj.vocab
+    vocab_filename = vocab_obj.vocab_filename
     training_set, test_set = None, None
     label_set = ['None','broadcast', 'injure', 'transportperson', 'transfermoney', 'artifact', 'contact',
                  'elect', 'correspondence', 'startposition', 'transportartifact', 'demonstrate', 'arrestjail',
@@ -73,7 +102,8 @@ class Dataset(object):
     window_size = 3
     def __init__(self, vocab_filename=None,training_dataset_file=None,test_dataset_file=None):
         if vocab_filename:
-            read_vocab(self,vocab_filename)
+            vocab_obf.vocab_filename = vocab_filename
+            vocab_obj.read_vocab()
         if training_dataset_file:
             self.training_dataset_file = training_dataset_file
         if test_dataset_file:
@@ -83,9 +113,9 @@ class Dataset(object):
         if not dataset_files_exist:
             self.prepare_dataset_file(self.training_dataset_file,self.training_source_folder, self.training_ann_folder)
             self.prepare_dataset_file(self.test_dataset_file,self.test_source_folder, self.test_ann_folder)
-            self.write_vocab(self.vocab_filename)
+            vocab_obj.write_vocab()
         else:
-            self.read_vocab(self.vocab_filename)
+            vocab_obj.read_vocab()
         self.build_dataset()
         self.show_label_percentage()
 
@@ -99,36 +129,12 @@ class Dataset(object):
     def set_test_folders(self,test_source_folder, test_ann_folder):
         self.test_source_folder, self.test_ann_folder = test_sourse_folder, test_ann_folder,
 
-    def write_vocab(self,vocab_filename):
-        with open(vocab_filename,"w") as v_file:
-            for key, value in self.vocab.items():
-                v_file.write("%s\t%s\n" % (key,value))
-
-    def read_vocab(self,vocab_filename):
-        self.vocab = []
-        with open(vocab_filename,"r") as v_file:
-            for line in iter(v_file.readline, ''):
-                [word,_] = line.split("\t")
-                self.vocab.append(word)
-
-    def update_vocab(self,source_filename):
-        tree = ElementTree.parse(source_filename)
-        root = tree.getroot()
-        for child in root.getchildren():
-            #print(child.text.strip())
-            for par in child.text.strip().split("\n"):
-                if par:
-                    sentences = sent_tokenize(par)
-                    for sent in sentences:
-                        words = word_tokenize(sent)
-                        for word in words:
-                            self.vocab[word] += 1
 
     # <span style="color: red">{}</span>
     def process_datafile(self,ann_filename,source_filename,dataset_file):
         with open(source_filename) as input:
             source_str = input.read()
-        self.update_vocab(source_filename)
+        vocab.update_vocab(source_filename)
         tree = ElementTree.parse(ann_filename)
         root = tree.getroot()
         offsets = {}
