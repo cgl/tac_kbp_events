@@ -1,4 +1,4 @@
-import nltk,os,pandas, numpy as np
+import nltk,os, numpy as np
 from data_conf import PROJECT_FOLDER, event_type_index, realis_index
 
 from sklearn.neighbors import KNeighborsClassifier
