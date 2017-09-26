@@ -47,8 +47,13 @@ event_type_index = {'Contact_Meet':0 ,
                     'Justice_Convict':34 ,
                     'Justice_Trial-Hearing':35,
                     'Business_End-Org' : 36,
+                    #manual entries:
+                    'Transaction_Transaction': 37,
+                    'Transaction' : 38,
 }
 
 realis_index = {'Other':1,
                 'Actual':2,
-                'Generic':3}
+                'Generic':3,
+                'NOT_ANNOTATED' : 0,
+}

@@ -1,4 +1,4 @@
-import os,sys,random
+import os,sys,pickle,random
 import numpy as np
 from xml.etree import ElementTree
 from data_conf import *
@@ -84,6 +84,43 @@ class Vocabulary(object):
                         words = word_tokenize(sent)
                         for word in words:
                             self.vocab[word] += 1
+
+class EmbeddingBank():
+    vocab_obj = Vocabulary()
+    vector_file = '/datasets/GoogleNews-vectors-negative300.bin'
+
+    def __init__(self,vector_file=None,vocab_file=None):
+        W_fname = "../data/vectors.pickle"
+        if os.path.isfile(W_fname):
+            pickled = pickle.load(open(W_fname,"rb"))
+            self.W = pickled['W']
+            self.word_idx_map = pickled['W_ind']
+        else:
+            if vector_file:
+                self.vector_file = vector_file
+            if vocab_file:
+                self.vocab_obj.vocab_filename = vocab_file
+            self.vocab_obj.read_vocab()
+            self.calculate_vector_list()
+            pickle.dump({'W': self.W , 'W_ind' : self.word_idx_map} , open(W_fname,"wb"))
+
+    def calculate_vector_list(self):
+        dim, self.word_vecs = load_bin_vec(self.vocab_obj.vocab) # fname=FLAGS.w2v_file
+        print("Loading idx map...")
+        self.W, self.word_idx_map = get_W(self.word_vecs)
+
+    def get_index(self,word):
+        if word in self.word_idx_map:
+            ind = self.word_idx_map.get(word)
+        else:
+            ind = 0
+        return ind
+
+    def get_embedding(self,word):
+        ind = self.get_index(word)
+        return self.W[ind]
+
+
 class Dataset(object):
     project_folder = PROJECT_FOLDER
     training_source_folder = os.path.join(project_folder,"data/LDC2017E02/data/2016/eval/eng/nw/source/")

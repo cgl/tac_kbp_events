@@ -1,6 +1,16 @@
 import nltk,os,pandas, numpy as np
 from data_conf import PROJECT_FOLDER, event_type_index, realis_index
 
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.svm import SVC
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.gaussian_process.kernels import RBF
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+
 from optparse import OptionParser
 
 SOURCE_FOLDER = os.path.join(PROJECT_FOLDER,"data/LDC2016E130_DEFT_Event_Sequencing_After_Link_Parent_Child_Annotation_Training_Data_V4/data/")
@@ -27,13 +37,12 @@ def add_links(line,events_doc, corefs_doc, afters_doc,parents_doc):
     elif line.startswith("@Subevent"):
         parents_doc[lid] = event_ids.split(",")
     else:
-        print(line)
+        #print(line)
         return
 
 
 # brat_conversion	1b386c986f9d06fd0a0dda70c3b8ade9	E194	145,154	sentences	Justice_Sentence	Actual
-def get_event_dict():
-    ANN_FILE = os.path.join(PROJECT_FOLDER,"data/LDC2016E130_test.tbf")
+def get_event_dict(ANN_FILE):
     events, corefs, afters,parents = {},{},{},{}
     with open(ANN_FILE) as ann_file:
         for line in ann_file:
@@ -78,62 +87,115 @@ def get_results_random(events, corefs, afters,parents):
         results_str.append("#EndOfDocument")
     print("\n".join(results_str),file=open("%s_results.txt" %run_id,"w"))
 
+def build_feature_vector(linked_events,events_doc,corefs_doc):
+    x = [len(events_doc),len(corefs_doc),]
+    for e_id in linked_events:
+        nugget = events_doc.get(e_id).get('nugget')
+        etype = events_doc.get(e_id).get('event_type')
+        offsets = events_doc.get(e_id).get('offsets').split(",")
+        realis = events_doc.get(e_id).get('realis')
+        #print("[%s]%s(%s)" %(e_id,nugget,etype))
+        x.append(nugget)
+        x.append(event_type_index[etype])
+        x.extend([int(x) for x in offsets])
+        x.append(realis_index[realis])
+    return x
+
 # 'E211' : {'offsets': '1190,1196', 'nugget': 'merged', 'event_type': 'Business_Merge-Org', 'realis': 'Actual'}
-def print_after_links_document(doc_id,events_doc, corefs_doc, afters_doc):
+def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,add_neg=True):
     #print("%s\t%s\t%s\t%s" %(doc_id,len(events_doc),len(corefs_doc),len(afters_doc)))
-    print(set(events_doc))
+    #print(set(events_doc))
     X = []
     Y=[]
-    for r_id in afters_doc.keys():
-        x = [len(events_doc),len(corefs_doc),]
-        for e_id in afters_doc[r_id]:
-            nugget = events_doc.get(e_id).get('nugget')
-            etype = events_doc.get(e_id).get('event_type')
-            offsets = events_doc.get(e_id).get('offsets').split(",")
-            realis = events_doc.get(e_id).get('realis')
-            print("[%s]%s(%s)" %(e_id,nugget,etype))
-            x.append(nugget)
-            x.append(event_type_index[etype])
-            x.extend(offsets)
-            x.append(realis_index[realis])
-        print(x)
+    for linked_event_ids in afters_doc.values(): #r_id in afters_doc.keys():
+        x = build_feature_vector(linked_event_ids,events_doc,corefs_doc)
         X.append(x)
         Y.append(1)
+    if add_neg:
+        # add same amount of negative links
+        event_id_list = events_doc.keys()
+        number_of_positive_links = len(X)
+        number_of_negative_links = 0
+        while number_of_negative_links < number_of_positive_links:
+            random_ids = random.sample(event_id_list,2)
+            if random_ids in afters_doc.values():
+                continue
+            x = build_feature_vector(random_ids,events_doc,corefs_doc)
+            X.append(x)
+            Y.append(0)
+            number_of_negative_links += 1
     return X,Y
 
-
-def get_features(events, corefs, afters,parents):
+def get_features(events, corefs, afters,parents,add_neg=True):
     run_id = "run1"
     results_str = []
     training_X = []
     training_Y = []
     for doc_id in events.keys():
-        X,Y = print_after_links_document(doc_id,events[doc_id],corefs[doc_id],afters[doc_id])
+        X,Y = build_feature_matrix_for_document(doc_id,events[doc_id],corefs[doc_id],afters[doc_id],add_neg=add_neg)
         training_X.extend(X)
         training_Y.extend(Y)
     return training_X,training_Y
-def preprocess_dataset(X,y):
-    arr_X = np.array(X)
-    nuggets = pandas.get_dummies(arr_X[:,2])
-    event_types = pandas.get_dummies(arr_X[:,3])
-    import ipdb ; ipdb.set_trace()
-    arr_X[:,3] = event_types.values.argmax(1)
+
+def preprocess_dataset(X):
+    arr_X = np.array(X,dtype=object)
+    from prepare_datafile import EmbeddingBank
+    emb = EmbeddingBank()
+
+    for i in [2,7]:
+        emb_column = [emb.get_embedding(arr_X[ind,i]) for ind in range(arr_X.shape[0])]
+        ind_column = [emb.get_index(arr_X[ind,i]) for ind in range(arr_X.shape[0])]
+        arr_X[:,i] = ind_column
+        arr_X = np.append(arr_X,np.array(emb_column),1)
+
+    return arr_X
 
 def main():
-    events, corefs, afters,parents = get_event_dict()
+    ANN_FILE = os.path.join(PROJECT_FOLDER,"data/LDC2016E130_test.tbf")
+    events, corefs, afters,parents = get_event_dict(ANN_FILE)
     get_results(events, corefs, afters,parents)
     #import ipdb ; ipdb.set_trace()
     #for line in events:
     #    print(line)
+
 def several_classifiers():
-    events, corefs, afters,parents = get_event_dict()
-    X_training,y_training = get_features(events, corefs, afters,parents)
-    X,y = preprocess_dataset(X_training,y_training)
-    from sklearn.neighbors import KNeighborsClassifier
-    neigh = KNeighborsClassifier(n_neighbors=3)
-    neigh.fit(X, y)
-    print(neigh.predict([[1.1]]))
-    print(neigh.predict_proba([[0.9]]))
+    names = ["Nearest Neighbors", "Linear SVM", "RBF SVM", "Gaussian Process",
+             "Decision Tree", "Random Forest", "Neural Net", "AdaBoost",
+             "Naive Bayes", "QDA"]
+    classifiers = [
+        KNeighborsClassifier(3),
+        SVC(kernel="linear", C=0.025),
+        SVC(gamma=2, C=1),
+        GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True),
+        DecisionTreeClassifier(max_depth=5),
+        RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
+        MLPClassifier(alpha=1),
+        AdaBoostClassifier(),
+        GaussianNB(),
+        QuadraticDiscriminantAnalysis()]
+
+    ANN_FILE = os.path.join(PROJECT_FOLDER,"data/LDC2016E130_training.tbf")
+    events, corefs, afters,parents = get_event_dict(ANN_FILE)
+    X_train,y_train = get_features(events, corefs, afters,parents)
+    X_train = preprocess_dataset(X_train)
+    #neigh = KNeighborsClassifier(n_neighbors=3)
+    #neigh.fit(X_train, y_train)
+
+    ANN_FILE = os.path.join(PROJECT_FOLDER,"data/LDC2016E130_test.tbf")
+    events, corefs, afters,parents = get_event_dict(ANN_FILE)
+    X_test,y_test = get_features(events, corefs, afters,parents,add_neg=False)
+    X_test = preprocess_dataset(X_test)
+
+    #neigh.score(X_t,y_test)
+    #import ipdb ; ipdb.set_trace()
+    #print(neigh.predict(X[0:10]))
+    #print(neigh.predict_proba(X[0:10]))
+
+    # iterate over classifiers
+    for name, clf in zip(names, classifiers):
+        clf.fit(X_train, y_train)
+        score = clf.score(X_test, y_test)
+        print("%s: %s" %(name,score))
 
 
 if __name__ == "__main__":
