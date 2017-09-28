@@ -107,6 +107,24 @@ def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,
     #print(set(events_doc))
     X = []
     Y=[]
+    event_id_list = set(events_doc.keys())
+    while event_id_list:
+        event_id = event_id_list.pop()
+        for to_event_id in event_id_list:
+            linked_event_ids = [event_id,to_event_id]
+            x = build_feature_vector(linked_event_ids,events_doc,corefs_doc)
+            X.append(x)
+            if linked_event_ids in afters_doc.values():
+                Y.append(1)
+            else:
+                Y.append(0)
+    return X,Y
+
+def build_feature_matrix_for_document_old(doc_id,events_doc, corefs_doc, afters_doc,add_neg=True):
+    #print("%s\t%s\t%s\t%s" %(doc_id,len(events_doc),len(corefs_doc),len(afters_doc)))
+    #print(set(events_doc))
+    X = []
+    Y=[]
     for linked_event_ids in afters_doc.values(): #r_id in afters_doc.keys():
         x = build_feature_vector(linked_event_ids,events_doc,corefs_doc)
         X.append(x)
@@ -164,8 +182,8 @@ def several_classifiers():
              "Naive Bayes", "QDA"]
     classifiers = [
         KNeighborsClassifier(3),
-        SVC(kernel="linear", C=0.025),
-        SVC(gamma=2, C=1),
+        #SVC(kernel="linear", C=0.025),
+        #SVC(gamma=2, C=1),
         GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True),
         DecisionTreeClassifier(max_depth=5),
         RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
@@ -195,8 +213,14 @@ def several_classifiers():
     for name, clf in zip(names, classifiers):
         clf.fit(X_train, y_train)
         score = clf.score(X_test, y_test)
-        print("%s: %s" %(name,score))
-
+        print("%s: %.4f" %(name,score))
+        """
+        clf.fit(X_train, y_train)
+        score2 = clf.score(X_test, y_test)
+        clf.fit(X_train, y_train)
+        score3 = clf.score(X_test, y_test)
+        print("%s: %.4f %.4f %.4f" %(name,score,score2,score3))
+        """
 
 if __name__ == "__main__":
 
