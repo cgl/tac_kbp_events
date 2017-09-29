@@ -70,7 +70,7 @@ def read_annotations(ANN_FILE):
                 pass
     return events, corefs, afters,parents
 
-def write_results_tbf(events, corefs, afters,parents,run_id = "run1"):
+def write_results_tbf(events,afters,run_id = "run1"):
     results_str = []
     for doc_id in events.keys():
         results_str.append("#BeginOfDocument %s" %doc_id)
@@ -85,7 +85,7 @@ def write_results_tbf(events, corefs, afters,parents,run_id = "run1"):
             results_str.append("@After\tR11\t%s,%s" % (key1,key2))
             #results = write_results_after_links_random(events, corefs, afters,parents)
         results_str.append("#EndOfDocument")
-    print("\n".join(results_str),file=open("%s_results.txt" %run_id,"w"))
+    print("\n".join(results_str),file=open("results/%s_results.txt" %run_id,"w"))
 
 def write_results_after_links_random(events, corefs, afters,parents):
         for a in range(1,4):
@@ -240,12 +240,12 @@ def get_dataset(filename,training=True,stats=False):
     if stats:
         get_stats(events, corefs, afters, parents,X_train,y_train,IDS )
     X_train = preprocess_dataset(X_train)
-    return X_train,y_train,IDS
+    return X_train,y_train,IDS, events
 
 def several_classifiers(stats=False):
-    X_train,y_train,IDS = get_dataset("data/LDC2016E130_training.tbf",stats=stats)
-    X_test,y_test,IDS_test = get_dataset("data/LDC2016E130_test.tbf",stats=stats)
-    #import ipdb ; ipdb.set_trace()    #print(neigh.predict(X[0:10]))    #print(neigh.predict_proba(X[0:10]))
+    X_train,y_train,IDS,_ = get_dataset("data/LDC2016E130_training.tbf",stats=stats)
+    X_test,y_test,IDS_test,events = get_dataset("data/LDC2016E130_test.tbf",stats=stats)
+    #print(neigh.predict(X[0:10]))    #print(neigh.predict_proba(X[0:10]))    #score = clf.score(X_test, y_test)
     print("Training ...")
     # iterate over classifiers
     for name, clf in zip(names, classifiers):
@@ -257,19 +257,9 @@ def several_classifiers(stats=False):
         for ind in links_found:
             afters_pred[IDS_test[ind][0]]["R%d" %ind] = [IDS_test[ind][1],IDS_test[ind][2]]
         timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
-        write_results_tbf(events, corefs, afters_pred,parents,run_id="%s-%s" %(name.replace(" ","-"),timestamp))
+        write_results_tbf(events, afters_pred,run_id="%s-%s" %(name.replace(" ","-"),timestamp))
         precision,recall,f1 = precision_score(y_test,y_pred), recall_score(y_test,y_pred), f1_score(y_test,y_pred)
         print("%s: %.4f %.4f %.4f" %(name,precision,recall,f1))
-
-        #score = clf.score(X_test, y_test)
-        #print("%s: %.4f" %(name,score))
-        """
-        clf.fit(X_train, y_train)
-        score2 = clf.score(X_test, y_test)
-        clf.fit(X_train, y_train)
-        score3 = clf.score(X_test, y_test)
-        print("%s: %.4f %.4f %.4f" %(name,score,score2,score3))
-        """
 
 if __name__ == "__main__":
 
