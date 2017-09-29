@@ -242,9 +242,9 @@ def get_dataset(filename,training=True,stats=False):
     X_train = preprocess_dataset(X_train)
     return X_train,y_train,IDS
 
-def several_classifiers():
-    X_train,y_train,IDS = get_dataset("data/LDC2016E130_training.tbf")
-    X_test,y_test,IDS_test = get_dataset("data/LDC2016E130_test.tbf",)
+def several_classifiers(stats=False):
+    X_train,y_train,IDS = get_dataset("data/LDC2016E130_training.tbf",stats=stats)
+    X_test,y_test,IDS_test = get_dataset("data/LDC2016E130_test.tbf",stats=stats)
     #import ipdb ; ipdb.set_trace()    #print(neigh.predict(X[0:10]))    #print(neigh.predict_proba(X[0:10]))
     print("Training ...")
     # iterate over classifiers
@@ -292,4 +292,4 @@ if __name__ == "__main__":
     elif options.statistics:
         stats()
     else:
-        several_classifiers()
+        several_classifiers(stats=options.statistics)
