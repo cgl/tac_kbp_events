@@ -289,7 +289,5 @@ if __name__ == "__main__":
         main()
     elif options.debug:
         main(debug=True)
-    elif options.statistics:
-        stats()
     else:
         several_classifiers(stats=options.statistics)
