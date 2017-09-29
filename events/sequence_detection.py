@@ -159,6 +159,8 @@ def build_feature_matrix_for_document_old(doc_id,events_doc, corefs_doc, afters_
             Y.append(0)
             #IDS.append([doc_id,random_ids[0],random_ids[1]])
             number_of_negative_links += 1
+    if len(afters_doc) != sum(Y):
+        print("Afters are missing in document %s (%d vs %d)" %(doc_id,len(afters_doc),sum(Y)))
     return X,Y
 
 def build_feature_matrix_for_dataset(events, corefs, afters,parents,training=True):
@@ -213,19 +215,38 @@ classifiers = [
     #QuadraticDiscriminantAnalysis()
 ]
 
-def several_classifiers():
-    ANN_FILE = os.path.join(PROJECT_FOLDER,"data/LDC2016E130_training.tbf")
+def get_stats(events, corefs, afters, parents,X_train,y_train,IDS):
+    number_of_events = sum([len(events[item]) for item in events])
+    number_of_docs = len(events)
+
+    number_of_afters = sum([len(afters[item]) for item in afters])
+
+    number_of_unique_events = 0
+    for doc_id in events:
+        number_of_unique_events += len(corefs[doc_id])
+        for event_id in events[doc_id]:
+            if "coref" not in events[doc_id][event_id]:
+                number_of_unique_events +=1
+
+    print("There are %d number of events in %d documents" %(number_of_events,number_of_docs))
+    print("There are %d number of unique events" %(number_of_unique_events))
+    print("There are %d number of after links" %(number_of_afters))
+
+# filename = "data/LDC2016E130_training.tbf"
+def get_dataset(filename,training=True,stats=False):
+    ANN_FILE = os.path.join(PROJECT_FOLDER,filename)
     events, corefs, afters,parents = read_annotations(ANN_FILE)
-    X_train,y_train,_ = build_feature_matrix_for_dataset(events, corefs, afters,parents)
+    X_train,y_train,IDS = build_feature_matrix_for_dataset(events, corefs, afters,parents,training=training)
+    if stats:
+        get_stats(events, corefs, afters, parents,X_train,y_train,IDS )
     X_train = preprocess_dataset(X_train)
+    return X_train,y_train,IDS
 
-    ANN_FILE = os.path.join(PROJECT_FOLDER,"data/LDC2016E130_test.tbf")
-    events, corefs, afters,parents = read_annotations(ANN_FILE)
-    X_test,y_test, IDS_test = build_feature_matrix_for_dataset(events, corefs, afters,parents,training=False)
-    X_test = preprocess_dataset(X_test)
-
+def several_classifiers():
+    X_train,y_train,IDS = get_dataset("data/LDC2016E130_training.tbf")
+    X_test,y_test,IDS_test = get_dataset("data/LDC2016E130_test.tbf",)
     #import ipdb ; ipdb.set_trace()    #print(neigh.predict(X[0:10]))    #print(neigh.predict_proba(X[0:10]))
-
+    print("Training ...")
     # iterate over classifiers
     for name, clf in zip(names, classifiers):
         clf.fit(X_train, y_train)
