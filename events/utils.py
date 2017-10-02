@@ -44,7 +44,8 @@ if __name__ == "__main__":
 
     if options.update_vocabulary:
         update_vocab_from_folders()
-    elif options.update_embeddings:
-        update_embeddings()
     elif options.main:
         main()
+
+    if options.update_embeddings:
+        update_embeddings()
