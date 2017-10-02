@@ -1,4 +1,4 @@
-import os,sys,pickle,random
+import logging,os,sys,pickle,random
 import numpy as np
 from xml.etree import ElementTree
 from data_conf import *
@@ -67,12 +67,15 @@ class Vocabulary(object):
 
     def read_vocab(self):
         self.vocab = []
-        with open(self.vocab_filename,"r") as v_file:
-            for line in iter(v_file.readline, ''):
-                [word,_] = line.split("\t")
-                self.vocab.append(word)
+        try:
+            with open(self.vocab_filename,"r") as v_file:
+                for line in iter(v_file.readline, ''):
+                    [word,_] = line.split("\t")
+                    self.vocab.append(word)
+        except FileNotFoundError as e:
+            logging.warning(e)
+
     def update_vocab(self,source_filename):
-        import ipdb ; ipdb.set_trace()
         tree = ElementTree.parse(source_filename)
         root = tree.getroot()
         for child in root.getchildren():
