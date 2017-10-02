@@ -6,7 +6,7 @@ VOCABFILE = os.path.join(PROJECT_FOLDER,"data/vocab.txt")
 
 SOURCE_FOLDER = os.path.join(PROJECT_FOLDER,"data/LDC2017E02/data/2016/eval/eng/nw/source/")
 ERE_FOLDER = os.path.join(PROJECT_FOLDER,"data/LDC2017E02/data/2016/eval/eng/nw/ere/")
-try::
+try:
     ANN_FILELIST = os.listdir(ERE_FOLDER)
     SOURCE_FILELIST = os.listdir(SOURCE_FOLDER)
     ANN_FILENAME = lambda x:  os.path.join(ERE_FOLDER,ANN_FILELIST[x])
