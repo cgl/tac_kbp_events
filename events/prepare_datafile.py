@@ -61,7 +61,7 @@ class Vocabulary(object):
     vocab_filename = os.path.join(PROJECT_FOLDER,"data/vocab.txt")
 
     def write_vocab(self):
-        with open(self,self.vocab_filename,"w") as v_file:
+        with open(self.vocab_filename,"w") as v_file:
             for key, value in self.vocab.items():
                 v_file.write("%s\t%s\n" % (key,value))
 
@@ -87,15 +87,24 @@ class Vocabulary(object):
                         words = word_tokenize(sent)
                         for word in words:
                             self.vocab[word] += 1
+    def update_vocab_from_text(self,text):
+        if text:
+            for par in text.split("\n"):
+                if par:
+                    sentences = sent_tokenize(par)
+                    for sent in sentences:
+                        words = word_tokenize(sent)
+                        for word in words:
+                            self.vocab[word] += 1
 
 class EmbeddingBank():
     vocab_obj = Vocabulary()
     vector_file = '/datasets/GoogleNews-vectors-negative300.bin'
 
     def __init__(self,vector_file=None,vocab_file=None):
-        W_fname = "../data/vectors.pickle"
-        if os.path.isfile(W_fname):
-            pickled = pickle.load(open(W_fname,"rb"))
+        self.W_fname = "../data/vectors.pickle"
+        if os.path.isfile(self.W_fname):
+            pickled = pickle.load(open(self.W_fname,"rb"))
             self.W = pickled['W']
             self.word_idx_map = pickled['W_ind']
         else:
@@ -103,9 +112,12 @@ class EmbeddingBank():
                 self.vector_file = vector_file
             if vocab_file:
                 self.vocab_obj.vocab_filename = vocab_file
-            self.vocab_obj.read_vocab()
-            self.calculate_vector_list()
-            pickle.dump({'W': self.W , 'W_ind' : self.word_idx_map} , open(W_fname,"wb"))
+            self.update_pickle()
+
+    def update_pickle(self):
+        self.vocab_obj.read_vocab()
+        self.calculate_vector_list()
+        pickle.dump({'W': self.W , 'W_ind' : self.word_idx_map} , open(self.W_fname,"wb"))
 
     def calculate_vector_list(self):
         dim, self.word_vecs = load_bin_vec(self.vocab_obj.vocab) # fname=FLAGS.w2v_file
@@ -327,6 +339,7 @@ def initialize(): # todo delete
         source_filename = SOURCE_FILENAME(file_index)
         prepare_datafile(ann_filename,source_filename,DATAFILE)
         file_index += 1
+
     """
     dimEmb, w2v = load_bin_vec(w2v_file, vocab)
     W1, word_idx_map = get_W(w2v, dimEmb)

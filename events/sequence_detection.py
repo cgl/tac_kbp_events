@@ -18,8 +18,6 @@ from sklearn.metrics import recall_score, precision_score, f1_score
 from optparse import OptionParser
 
 import random
-SOURCE_FOLDER = os.path.join(PROJECT_FOLDER,"data/LDC2016E130_DEFT_Event_Sequencing_After_Link_Parent_Child_Annotation_Training_Data_V4/data/")
-training_folder = os.path.join(SOURCE_FOLDER,"training")
 
 """
 python2 ~/work/EvmEval/util/brat2tbf.py -d /Users/cagil/work/tac_kbp_events/data/LDC2016E130_DEFT_Event_Sequencing_After_Link_Parent_Child_Annotation_Training_Data_V4/data/training/ -o /Users/cagil/work/tac_kbp_events/data/LDC2016E130_training
@@ -45,11 +43,10 @@ def read_relations(line,events_doc, corefs_doc, afters_doc,parents_doc):
         #print(line)
         return
 
-
 # brat_conversion	1b386c986f9d06fd0a0dda70c3b8ade9	E194	145,154	sentences	Justice_Sentence	Actual
-def read_annotations(ANN_FILE):
+def read_annotations(ann_file_tbf):
     events, corefs, afters,parents = {},{},{},{}
-    with open(ANN_FILE) as ann_file:
+    with open(ann_file_tbf) as ann_file:
         for line in ann_file:
             if line.startswith("#B"):
                 doc_id = line.strip().split(" ")[-1]
@@ -191,10 +188,10 @@ def preprocess_dataset(X):
     return arr_X
 
 def main(debug=False):
-    ANN_FILE = os.path.join(PROJECT_FOLDER,"data/LDC2016E130_test.tbf")
+    ann_file_tbf = os.path.join(PROJECT_FOLDER,"data/LDC2016E130_test.tbf")
     if debug:
         import ipdb ; ipdb.set_trace()
-    events, corefs, afters,parents = read_annotations(ANN_FILE)
+    events, corefs, afters,parents = read_annotations(ann_file_tbf)
     get_results(events, corefs, afters,parents)
     #for line in events:
     #    print(line)
@@ -234,8 +231,8 @@ def get_stats(events, corefs, afters, parents,X_train,y_train,IDS):
 
 # filename = "data/LDC2016E130_training.tbf"
 def get_dataset(filename,training=True,stats=False):
-    ANN_FILE = os.path.join(PROJECT_FOLDER,filename)
-    events, corefs, afters,parents = read_annotations(ANN_FILE)
+    ann_file_tbf = os.path.join(PROJECT_FOLDER,filename)
+    events, corefs, afters,parents = read_annotations(ann_file_tbf)
     X_train,y_train,IDS = build_feature_matrix_for_dataset(events, corefs, afters,parents,training=training)
     if stats:
         get_stats(events, corefs, afters, parents,X_train,y_train,IDS )

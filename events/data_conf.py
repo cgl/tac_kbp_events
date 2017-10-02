@@ -14,6 +14,10 @@ try:
 except Exception as e:
     print(e.args[0])
 
+# Sequence
+SEQUENCE_SOURCE_FOLDER = os.path.join(PROJECT_FOLDER,"data/LDC2016E130_DEFT_Event_Sequencing_After_Link_Parent_Child_Annotation_Training_Data_V4/data/")
+
+
 event_type_index = {'Contact_Meet':0 ,
                     'Movement_Transport-Artifact':1 ,
                     'Life_Divorce':2 ,
