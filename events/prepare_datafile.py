@@ -21,8 +21,11 @@ def load_bin_vec(vocab,fname='/datasets/GoogleNews-vectors-negative300.bin'):
     word_vecs = {}
     dim = 0
     for word in vocab:
-        word_vecs[word] = model.word_vec(word)
-        dim = word_vecs[word].shape[0]
+        try:
+            word_vecs[word] = model.word_vec(word)
+            dim = word_vecs[word].shape[0]
+        except KeyError as e:
+            logging.warning(e)
     print('dim: ', dim)
     return dim, word_vecs
 
