@@ -43,6 +43,15 @@ def read_relations(line,events_doc, corefs_doc, afters_doc,parents_doc):
         #print(line)
         return
 
+def add_corefs_to_single_events(events,corefs):
+    for doc_id in events.keys():
+        index = len(corefs[doc_id])
+        for event_id in events[doc_id].keys():
+            if "coref" not in events[doc_id][event_id]:
+                events[doc_id][event_id]["coref"] = "C%d" %index
+                corefs[doc_id]["C%d" %index] = [event_id]
+                index +=1
+
 # brat_conversion	1b386c986f9d06fd0a0dda70c3b8ade9	E194	145,154	sentences	Justice_Sentence	Actual
 def read_annotations(ann_file_tbf):
     events, corefs, afters,parents = {},{},{},{}
@@ -65,6 +74,7 @@ def read_annotations(ann_file_tbf):
                 #yield doc_id, event_id, offsets, nugget, event_type, realis
             else:
                 pass
+    add_corefs_to_single_events(events,corefs)
     return events, corefs, afters,parents
 
 def write_results_tbf(events,afters,run_id = "run1"):
@@ -136,12 +146,12 @@ def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc)
 def build_feature_matrix_for_document_old(doc_id,events_doc, corefs_doc, afters_doc,add_neg=True):
     #print("%s\t%s\t%s\t%s" %(doc_id,len(events_doc),len(corefs_doc),len(afters_doc)))
     #print(set(events_doc))
-    X = []
-    Y=[]
+    X,Y,IDS = [],[],[]
     for linked_event_ids in afters_doc.values(): #r_id in afters_doc.keys():
         x = build_feature_vector(linked_event_ids,events_doc,corefs_doc)
         X.append(x)
         Y.append(1)
+        IDS.append([doc_id,linked_event_ids[0],linked_event_ids[1]])
     if add_neg:
         # add same amount of negative links
         event_id_list = events_doc.keys()
@@ -154,11 +164,11 @@ def build_feature_matrix_for_document_old(doc_id,events_doc, corefs_doc, afters_
             x = build_feature_vector(random_ids,events_doc,corefs_doc)
             X.append(x)
             Y.append(0)
-            #IDS.append([doc_id,random_ids[0],random_ids[1]])
+            IDS.append([doc_id,random_ids[0],random_ids[1]])
             number_of_negative_links += 1
     if len(afters_doc) != sum(Y):
         print("Afters are missing in document %s (%d vs %d)" %(doc_id,len(afters_doc),sum(Y)))
-    return X,Y
+    return X,Y,IDS
 
 def build_feature_matrix_for_dataset(events, corefs, afters,parents,training=True):
     run_id = "run1"
@@ -167,7 +177,10 @@ def build_feature_matrix_for_dataset(events, corefs, afters,parents,training=Tru
     training_Y = []
     training_IDS = []
     for doc_id in events.keys():
-        X,Y, IDS = build_feature_matrix_for_document(doc_id,events[doc_id],corefs[doc_id],afters[doc_id])
+        if training:
+            X,Y, IDS = build_feature_matrix_for_document_old(doc_id,events[doc_id],corefs[doc_id],afters[doc_id])
+        else:
+            X,Y, IDS = build_feature_matrix_for_document(doc_id,events[doc_id],corefs[doc_id],afters[doc_id])
         training_X.extend(X)
         training_Y.extend(Y)
         training_IDS.extend(IDS)
@@ -242,20 +255,28 @@ def get_dataset(filename,training=True,stats=False):
     X_train = preprocess_dataset(X_train)
     return X_train,y_train,IDS, events
 
+def after_links_as_dictionary(y_pred,IDS_test,events):
+    links_found = [i for i in range(len(y_pred)) if y_pred[i]]
+    import ipdb ; ipdb.set_trace()
+    afters_pred = defaultdict(dict)
+
+    for ind in links_found:
+        doc_id = IDS_test[ind][0]
+        from_event, to_event = IDS_test[ind][1],IDS_test[ind][2]
+        events[doc_id]
+        afters_pred[doc_id]["R%d" %ind] = [IDS_test[ind][1],IDS_test[ind][2]]
+    return afters_pred
+
 def several_classifiers(stats=False):
-    X_train,y_train,IDS,_ = get_dataset("data/LDC2016E130_training.tbf",stats=stats)
-    X_test,y_test,IDS_test,events = get_dataset("data/LDC2016E130_test.tbf",stats=stats)
+    X_train,y_train,IDS,_ = get_dataset("data/LDC2016E130_training.tbf",stats=stats,training=True)
+    X_test,y_test,IDS_test,events = get_dataset("data/LDC2016E130_test.tbf",stats=stats,training=False)
     #print(neigh.predict(X[0:10]))    #print(neigh.predict_proba(X[0:10]))    #score = clf.score(X_test, y_test)
     print("Training ...")
     # iterate over classifiers
     for name, clf in zip(names, classifiers):
         clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
-        links_found = [i for i in range(len(y_pred)) if y_pred[i]]
-        afters_pred = defaultdict(dict)
-
-        for ind in links_found:
-            afters_pred[IDS_test[ind][0]]["R%d" %ind] = [IDS_test[ind][1],IDS_test[ind][2]]
+        afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events)
         timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
         write_results_tbf(events, afters_pred,run_id="%s-%s" %(name.replace(" ","-"),timestamp))
         precision,recall,f1 = precision_score(y_test,y_pred), recall_score(y_test,y_pred), f1_score(y_test,y_pred)
