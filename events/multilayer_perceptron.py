@@ -39,6 +39,11 @@ biases = {
     'out': tf.Variable(tf.random_normal([n_classes]))
 }
 
+def one_hot_y(list_of_bin):
+    """
+    Takes list of binary input and returns one hot representation as numpy array
+    """
+    return np.column_stack((1 - np.array(list_of_bin),np.array(list_of_bin)))
 
 # Create model
 def multilayer_perceptron(x):
@@ -75,7 +80,7 @@ with tf.Session() as sess:
         # Loop over all batches
         for i in range(total_batch):
             batch_x = np.array(X_train[i*batch_size:(i*batch_size)+batch_size])
-            batch_y = np.array(y_train[i*batch_size:(i*batch_size)+batch_size])
+            batch_y = one_hot_y(y_train[i*batch_size:(i*batch_size)+batch_size])
             print(batch_x.shape)
             print(batch_y.shape)
             # Run optimization op (backprop) and cost op (to get loss value)
@@ -93,4 +98,4 @@ with tf.Session() as sess:
     correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(Y, 1))
     # Calculate accuracy
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-    print("Accuracy:", accuracy.eval({X: np.array(X_test), Y: np.array(y_test)}))
+    print("Accuracy:", accuracy.eval({X: np.array(X_test), Y: one_hot_y(y_test)}))
