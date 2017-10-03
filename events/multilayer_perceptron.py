@@ -97,4 +97,4 @@ with tf.Session() as sess:
     # Calculate accuracy
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
     print("Accuracy:", accuracy.eval({X: np.array(X_test), Y: one_hot_y(y_test)}))
-    print(pred)
+    print("Results:\n", pred.eval({X: np.array(X_test), Y: one_hot_y(y_test)})))
