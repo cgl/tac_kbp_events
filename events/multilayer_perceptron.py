@@ -10,7 +10,7 @@ Project: https://github.com/aymericdamien/TensorFlow-Examples/
 from __future__ import print_function
 
 import tensorflow as tf
-
+import numpy as np
 # Parameters
 learning_rate = 0.001
 training_epochs = 15
