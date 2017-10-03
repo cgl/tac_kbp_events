@@ -91,4 +91,4 @@ with tf.Session() as sess:
     correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(Y, 1))
     # Calculate accuracy
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-    print("Accuracy:", accuracy.eval({X: X_test, Y: y_test}))
+    print("Accuracy:", accuracy.eval({X: np.array(X_test), Y: np.array(y_test)}))
