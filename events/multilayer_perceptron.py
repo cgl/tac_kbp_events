@@ -81,8 +81,6 @@ with tf.Session() as sess:
         for i in range(total_batch):
             batch_x = np.array(X_train[i*batch_size:(i*batch_size)+batch_size])
             batch_y = one_hot_y(y_train[i*batch_size:(i*batch_size)+batch_size])
-            print(batch_x.shape)
-            print(batch_y.shape)
             # Run optimization op (backprop) and cost op (to get loss value)
             _, c = sess.run([train_op, loss_op], feed_dict={X: batch_x,
                                                             Y: batch_y})
@@ -99,3 +97,4 @@ with tf.Session() as sess:
     # Calculate accuracy
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
     print("Accuracy:", accuracy.eval({X: np.array(X_test), Y: one_hot_y(y_test)}))
+    import ipdb ; ipdb.set_trace()
