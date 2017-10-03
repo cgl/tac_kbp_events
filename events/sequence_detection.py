@@ -180,13 +180,13 @@ def preprocess_dataset(X):
     from prepare_datafile import EmbeddingBank
     emb = EmbeddingBank()
     emb_sim_column = [emb.get_embedding(arr_X[ind,2])-emb.get_embedding(arr_X[ind,7]) for ind in range(arr_X.shape[0])]
-    """
+
     for i in [2,7]:
         emb_column = [emb.get_embedding(arr_X[ind,i]) for ind in range(arr_X.shape[0])]
         ind_column = [emb.get_index(arr_X[ind,i]) for ind in range(arr_X.shape[0])]
         arr_X[:,i] = ind_column
-        arr_X = np.append(arr_X,np.array(emb_column),1)
-    """
+        #arr_X = np.append(arr_X,np.array(emb_column),1)
+
     arr_X = np.append(arr_X,np.array(emb_sim_column),1)
     return arr_X
 
