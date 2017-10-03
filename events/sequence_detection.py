@@ -187,7 +187,7 @@ def preprocess_dataset(X):
         arr_X[:,i] = ind_column
         #arr_X = np.append(arr_X,np.array(emb_column),1)
 
-    arr_X = np.append(arr_X,np.array(emb_sim_column),1)
+    #arr_X = np.append(arr_X,np.array(emb_sim_column),1)
     return arr_X
 
 def main(debug=False):
