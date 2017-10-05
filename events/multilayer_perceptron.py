@@ -11,6 +11,8 @@ from __future__ import print_function
 
 import tensorflow as tf
 import numpy as np
+import datetime
+from sequence_detection import after_links_as_dictionary,write_results_tbf
 # Parameters
 learning_rate = 0.001
 training_epochs = 15
@@ -98,8 +100,25 @@ with tf.Session() as sess:
 
     # Test model
     pred = tf.nn.softmax(logits)  # Apply softmax to logits
-    correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(Y, 1))
+    y_pred = tf.argmax(pred, 1)
+    correct_prediction = tf.equal(y_pred, tf.argmax(Y, 1))
     # Calculate accuracy
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-    print("Accuracy:", accuracy.eval({X: np.array(X_test), Y: one_hot_y(y_test)}) )
-    print("Results:\n", pred.eval({X: np.array(X_test), Y: one_hot_y(y_test)}) )
+
+    val_accuracy, y_pred = sess.run([accuracy, y_pred], feed_dict={X: np.array(X_test), Y: one_hot_y(y_test)})
+
+    TP = tf.count_nonzero(predicted * actual)
+    TN = tf.count_nonzero((predicted - 1) * (actual - 1))
+    FP = tf.count_nonzero(predicted * (actual - 1))
+    FN = tf.count_nonzero((predicted - 1) * actual)
+
+    precision = TP / (TP + FP)
+    recall = TP / (TP + FN)
+    f1 = 2 * precision * recall / (precision + recall)
+
+    print("Accuracy:", val_accuracy)
+    print("Results:%f\t%f\t%f\n" %(precision,recall,f1))
+
+    afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events)
+    timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
+    write_results_tbf(events, afters_pred,run_id="%s-%s" %("Mlp-3Layer",timestamp))
