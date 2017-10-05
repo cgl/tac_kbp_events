@@ -257,7 +257,6 @@ def get_dataset(filename,training=True,stats=False):
 
 def after_links_as_dictionary(y_pred,IDS_test,events):
     links_found = [i for i in range(len(y_pred)) if y_pred[i]]
-    import ipdb ; ipdb.set_trace()
     afters_pred = defaultdict(dict)
 
     for ind in links_found:

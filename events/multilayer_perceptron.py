@@ -117,7 +117,6 @@ with tf.Session() as sess:
 
     val_accuracy,precision,recall,f1, y_pred = sess.run([accuracy, precision,recall,f1, y_pred], feed_dict={X: np.array(X_test), Y: one_hot_y(y_test)})
 
-    import ipdb ; ipdb.set_trace()
     print("Accuracy:", val_accuracy)
     print("Results:%s\t%s\t%s\n" %(precision,recall,f1))
 
