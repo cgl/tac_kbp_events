@@ -15,7 +15,7 @@ import datetime
 from sequence_detection import after_links_as_dictionary,write_results_tbf
 # Parameters
 learning_rate = 0.001
-training_epochs = 500
+training_epochs = 350
 batch_size = 100
 display_step = 25
 
@@ -59,7 +59,7 @@ def multilayer_perceptron(x):
     # Output fully connected layer with a neuron for each class
     # Hidden fully connected layer with 256 neurons
     layer_3 = tf.add(tf.matmul(layer_2, weights['h3']), biases['b3'])
-    out_layer = tf.matmul(layer_3, weights['out']) + biases['out']
+    out_layer = tf.matmul(layer_2, weights['out']) + biases['out']
     return out_layer
 
 # Construct model

@@ -157,7 +157,7 @@ def build_feature_matrix_for_document_old(doc_id,events_doc, corefs_doc, afters_
         event_id_list = events_doc.keys()
         number_of_positive_links = len(X)
         number_of_negative_links = 0
-        while number_of_negative_links < number_of_positive_links:
+        while number_of_negative_links < 4*number_of_positive_links:
             random_ids = random.sample(event_id_list,2)
             if random_ids in afters_doc.values():
                 continue
@@ -266,6 +266,11 @@ def after_links_as_dictionary(y_pred,IDS_test,events):
         afters_pred[doc_id]["R%d" %ind] = [IDS_test[ind][1],IDS_test[ind][2]]
     return afters_pred
 
+def post_process_predictions(y_pred,IDS_test,events):
+    afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events)
+    timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
+    write_results_tbf(events, afters_pred,run_id="%s-%s" %(name.replace(" ","-"),timestamp))
+
 def several_classifiers(stats=False):
     X_train,y_train,IDS,_ = get_dataset("data/LDC2016E130_training.tbf",stats=stats,training=True)
     X_test,y_test,IDS_test,events = get_dataset("data/LDC2016E130_test.tbf",stats=stats,training=False)
@@ -275,9 +280,7 @@ def several_classifiers(stats=False):
     for name, clf in zip(names, classifiers):
         clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
-        afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events)
-        timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
-        write_results_tbf(events, afters_pred,run_id="%s-%s" %(name.replace(" ","-"),timestamp))
+        post_process_predictions(y_pred,IDS_test,events)
         precision,recall,f1 = precision_score(y_test,y_pred), recall_score(y_test,y_pred), f1_score(y_test,y_pred)
         print("%s: %.4f %.4f %.4f" %(name,precision,recall,f1))
 
