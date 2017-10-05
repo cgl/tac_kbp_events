@@ -106,10 +106,10 @@ with tf.Session() as sess:
     # Calculate accuracy
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 
-    TP = tf.count_nonzero(y_pred * y_true)
-    TN = tf.count_nonzero((y_pred - 1) * (y_true - 1))
-    FP = tf.count_nonzero(y_pred * (y_true - 1))
-    FN = tf.count_nonzero((y_pred - 1) * y_true)
+    TP = tf.count_nonzero(y_pred * y_true, dtype=tf.float32)
+    TN = tf.count_nonzero((y_pred - 1) * (y_true - 1), dtype=tf.float32)
+    FP = tf.count_nonzero(y_pred * (y_true - 1), dtype=tf.float32)
+    FN = tf.count_nonzero((y_pred - 1) * y_true, dtype=tf.float32)
 
     precision = TP / (TP + FP)
     recall = TP / (TP + FN)
