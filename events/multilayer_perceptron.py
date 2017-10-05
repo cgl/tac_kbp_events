@@ -15,9 +15,9 @@ import datetime
 from sequence_detection import after_links_as_dictionary,write_results_tbf
 # Parameters
 learning_rate = 0.001
-training_epochs = 250
+training_epochs = 500
 batch_size = 100
-display_step = 10
+display_step = 25
 
 # Network Parameters
 n_hidden_1 = 256 # 1st layer number of neurons
