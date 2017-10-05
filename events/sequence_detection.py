@@ -184,7 +184,7 @@ def build_feature_matrix_for_dataset(events, corefs, afters,parents,training=Tru
         training_X.extend(X)
         training_Y.extend(Y)
         training_IDS.extend(IDS)
-    print("%s set: %s samples" %("Training" if training else "Test", len(training_X)))
+    print("%s set: %s possible links between pairs" %("Training" if training else "Test", len(training_X)))
     return training_X,training_Y, training_IDS
 
 def preprocess_dataset(X):
