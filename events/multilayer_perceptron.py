@@ -101,16 +101,17 @@ with tf.Session() as sess:
     # Test model
     pred = tf.nn.softmax(logits)  # Apply softmax to logits
     y_pred = tf.argmax(pred, 1)
+    y_true = tf.argmax(Y, 1)
     correct_prediction = tf.equal(y_pred, tf.argmax(Y, 1))
     # Calculate accuracy
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 
     val_accuracy, y_pred = sess.run([accuracy, y_pred], feed_dict={X: np.array(X_test), Y: one_hot_y(y_test)})
 
-    TP = tf.count_nonzero(predicted * actual)
-    TN = tf.count_nonzero((predicted - 1) * (actual - 1))
-    FP = tf.count_nonzero(predicted * (actual - 1))
-    FN = tf.count_nonzero((predicted - 1) * actual)
+    TP = tf.count_nonzero( * y_true)
+    TN = tf.count_nonzero((y_pred - 1) * (y_true - 1))
+    FP = tf.count_nonzero(y_pred * (y_true - 1))
+    FN = tf.count_nonzero((y_pred - 1) * y_true)
 
     precision = TP / (TP + FP)
     recall = TP / (TP + FN)
