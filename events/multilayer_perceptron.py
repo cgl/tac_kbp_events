@@ -15,9 +15,9 @@ import datetime
 from sequence_detection import after_links_as_dictionary,write_results_tbf
 # Parameters
 learning_rate = 0.001
-training_epochs = 150
+training_epochs = 250
 batch_size = 100
-display_step = 1
+display_step = 10
 
 # Network Parameters
 n_hidden_1 = 256 # 1st layer number of neurons
@@ -106,8 +106,6 @@ with tf.Session() as sess:
     # Calculate accuracy
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 
-    val_accuracy, y_pred = sess.run([accuracy, y_pred], feed_dict={X: np.array(X_test), Y: one_hot_y(y_test)})
-
     TP = tf.count_nonzero(y_pred * y_true)
     TN = tf.count_nonzero((y_pred - 1) * (y_true - 1))
     FP = tf.count_nonzero(y_pred * (y_true - 1))
@@ -116,6 +114,9 @@ with tf.Session() as sess:
     precision = TP / (TP + FP)
     recall = TP / (TP + FN)
     f1 = 2 * precision * recall / (precision + recall)
+
+    val_accuracy,precision,recall,f1, y_pred = sess.run([accuracy, precision,recall,f1, y_pred], feed_dict={X: np.array(X_test), Y: one_hot_y(y_test)})
+
     import ipdb ; ipdb.set_trace()
     print("Accuracy:", val_accuracy)
     print("Results:%s\t%s\t%s\n" %(precision,recall,f1))
