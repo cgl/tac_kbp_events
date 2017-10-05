@@ -15,7 +15,7 @@ import datetime
 from sequence_detection import after_links_as_dictionary,write_results_tbf
 # Parameters
 learning_rate = 0.001
-training_epochs = 50
+training_epochs = 150
 batch_size = 100
 display_step = 1
 
@@ -116,9 +116,9 @@ with tf.Session() as sess:
     precision = TP / (TP + FP)
     recall = TP / (TP + FN)
     f1 = 2 * precision * recall / (precision + recall)
-
+    import ipdb ; ipdb.set_trace()
     print("Accuracy:", val_accuracy)
-    print("Results:%f\t%f\t%f\n" %(precision,recall,f1))
+    print("Results:%s\t%s\t%s\n" %(precision,recall,f1))
 
     afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events)
     timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
