@@ -15,7 +15,7 @@ import datetime
 from sequence_detection import after_links_as_dictionary,write_results_tbf
 # Parameters
 learning_rate = 0.001
-training_epochs = 15
+training_epochs = 50
 batch_size = 100
 display_step = 1
 
@@ -108,7 +108,7 @@ with tf.Session() as sess:
 
     val_accuracy, y_pred = sess.run([accuracy, y_pred], feed_dict={X: np.array(X_test), Y: one_hot_y(y_test)})
 
-    TP = tf.count_nonzero( * y_true)
+    TP = tf.count_nonzero(y_pred * y_true)
     TN = tf.count_nonzero((y_pred - 1) * (y_true - 1))
     FP = tf.count_nonzero(y_pred * (y_true - 1))
     FN = tf.count_nonzero((y_pred - 1) * y_true)
