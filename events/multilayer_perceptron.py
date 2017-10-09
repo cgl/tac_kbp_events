@@ -12,6 +12,8 @@ from __future__ import print_function
 import tensorflow as tf
 import numpy as np
 import datetime
+from optparse import OptionParser
+
 from sequence_detection import after_links_as_dictionary,write_results_tbf
 # Parameters
 learning_rate = 0.001
