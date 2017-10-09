@@ -153,10 +153,10 @@ def build_feature_matrix_for_document_old(doc_id,events_doc, corefs_doc, afters_
         Y.append(1)
         IDS.append([doc_id,linked_event_ids[0],linked_event_ids[1]])
     if add_neg:
-        # add same amount of negative links
         event_id_list = events_doc.keys()
         number_of_positive_links = len(X)
         number_of_negative_links = 0
+        # add same amount of negative links
         while number_of_negative_links < 4*number_of_positive_links:
             random_ids = random.sample(event_id_list,2)
             if random_ids in afters_doc.values():
@@ -178,7 +178,7 @@ def build_feature_matrix_for_dataset(events, corefs, afters,parents,training=Tru
     training_IDS = []
     for doc_id in events.keys():
         if training:
-            X,Y, IDS = build_feature_matrix_for_document_old(doc_id,events[doc_id],corefs[doc_id],afters[doc_id])
+            X,Y, IDS = build_feature_matrix_for_document(doc_id,events[doc_id],corefs[doc_id],afters[doc_id])
         else:
             X,Y, IDS = build_feature_matrix_for_document(doc_id,events[doc_id],corefs[doc_id],afters[doc_id])
         training_X.extend(X)
