@@ -51,7 +51,7 @@ def one_hot_y(list_of_bin):
     return np.column_stack((1 - np.array(list_of_bin),np.array(list_of_bin)))
 
 # Create model
-def multilayer_perceptron(x):
+def multilayer_perceptron(x,nol=2):
     # Hidden fully connected layer with 256 neurons
     layer_1 = tf.add(tf.matmul(x, weights['h1']), biases['b1'])
     # Hidden fully connected layer with 256 neurons
@@ -59,11 +59,16 @@ def multilayer_perceptron(x):
     # Output fully connected layer with a neuron for each class
     # Hidden fully connected layer with 256 neurons
     layer_3 = tf.add(tf.matmul(layer_2, weights['h3']), biases['b3'])
-    out_layer = tf.matmul(layer_2, weights['out']) + biases['out']
+    latest_layer = layer_2 if nol == 2 else layer_3
+    out_layer = tf.matmul(latest_layer, weights['out']) + biases['out']
     return out_layer
 
+parser = OptionParser()
+parser.add_option('-l','--layer',default=2,type=int,metavar='number_of_layers',help='')
+(options, args) = parser.parse_args()
+
 # Construct model
-logits = multilayer_perceptron(X)
+logits = multilayer_perceptron(X,nol=options.layer)
 
 # Define loss and optimizer
 loss_op = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
