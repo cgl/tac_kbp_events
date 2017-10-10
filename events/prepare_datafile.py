@@ -115,7 +115,7 @@ class Vocabulary(object):
         test_folder = os.path.join(SEQUENCE_SOURCE_FOLDER,"test")
         folder_list = [training_folder,test_folder]
         text = get_all_text_from_folders(folder_list)
-        voc.update_vocab_from_text(text)
+        self.update_vocab_from_text(text)
 
 
 class EmbeddingBank():
