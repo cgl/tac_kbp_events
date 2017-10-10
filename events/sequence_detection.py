@@ -195,8 +195,11 @@ def build_feature_matrix_for_dataset(events, corefs, afters,parents,training=Tru
 def cosine_sim(word_emb1,word_emb2):
     numerator = np.dot(word_emb1,word_emb2)
     denominator = np.sqrt(np.sum(word_emb1**2)) * np.sqrt(np.sum(word_emb2**2))
-    print(numerator,denominator,float(numerator/denominator))
-    return float(numerator/denominator)
+    #print(numerator,denominator,float(numerator/denominator))
+    if numerator and denominator:
+        return float(numerator/denominator)
+    else:
+        return 0
 
 def preprocess_dataset(X):
     arr_X = np.array(X,dtype=object)
