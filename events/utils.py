@@ -23,17 +23,6 @@ def get_all_nuggets_from_folders():
     #pprint.pprint(nuggets_dict,width=1)
     return nuggets
 
-def get_all_text_from_folders(folder_list):
-    my_parser = html_parser.MyHTMLParser()
-    for folder in folder_list:
-        list_dir = os.listdir(folder)
-        for filename in list_dir:
-            if filename.endswith("txt"):
-                with open(os.path.join(folder,filename)) as sourcefile:
-                    source = sourcefile.read()
-                    my_parser.feed(source)
-    return my_parser.get_text()
-
 def update_vocab():
     voc = Vocabulary()
     update_vocab_from_folders()
