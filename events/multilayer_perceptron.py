@@ -132,4 +132,4 @@ with tf.Session() as sess:
     afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events)
     timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
     write_results_tbf(events, afters_pred,run_id="%s-%s" %("Mlp-3Layer",timestamp))
-    import ipdb ; ipdb.set_trace()
+    print(pred)
