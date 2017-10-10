@@ -279,7 +279,7 @@ def get_dataset(filename,training=True,stats=False):
 
 def after_links_as_dictionary(y_pred,IDS_test,events,corefs):
     links_found = [i for i in range(len(y_pred)) if y_pred[i]]
-    print("Number of links found %d" %len(links_foun))
+    print("Number of links found %d" %len(links_found))
     afters_pred = defaultdict(dict)
     old_doc_id = ""
     for ind in links_found:
