@@ -165,7 +165,7 @@ def build_feature_matrix_for_document_old(doc_id,events_doc, corefs_doc, afters_
             if random_ids in afters_doc.values():
                 continue
             x = build_feature_vector(random_ids,events_doc,corefs_doc)
-            if x[-1] > 400:
+            if x[-1] > 350:
                 continue
             X.append(x)
             Y.append(0)
@@ -208,7 +208,7 @@ def preprocess_dataset(X):
     #emb_sim_column = [emb.get_embedding(arr_X[ind,2])-emb.get_embedding(arr_X[ind,7]) for ind in range(arr_X.shape[0])]
 
     emb_sim_column = [cosine_sim(emb.get_embedding(arr_X[ind,2]),emb.get_embedding(arr_X[ind,7])) for ind in range(arr_X.shape[0])]
-    import ipdb ; ipdb.set_trace()
+
     for i in [2,7]:
         emb_column = [emb.get_embedding(arr_X[ind,i]) for ind in range(arr_X.shape[0])]
         ind_column = [emb.get_index(arr_X[ind,i]) for ind in range(arr_X.shape[0])]
@@ -269,7 +269,7 @@ def get_dataset(filename,training=True,stats=False):
     if stats:
         get_stats(events, corefs, afters, parents,X_train,y_train,IDS )
     X_train = preprocess_dataset(X_train)
-    return X_train,y_train,IDS, events
+    return X_train,y_train,IDS, events,corefs
 
 def after_links_as_dictionary(y_pred,IDS_test,events):
     links_found = [i for i in range(len(y_pred)) if y_pred[i]]
@@ -288,8 +288,8 @@ def post_process_predictions(y_pred,IDS_test,events):
     write_results_tbf(events, afters_pred,run_id="%s-%s" %(name.replace(" ","-"),timestamp))
 
 def several_classifiers(stats=False):
-    X_train,y_train,IDS,_ = get_dataset("data/LDC2016E130_training.tbf",stats=stats,training=True)
-    X_test,y_test,IDS_test,events = get_dataset("data/LDC2016E130_test.tbf",stats=stats,training=True)
+    X_train,y_train,IDS,_,_ = get_dataset("data/LDC2016E130_training.tbf",stats=stats,training=True)
+    X_test,y_test,IDS_test,events,_ = get_dataset("data/LDC2016E130_test.tbf",stats=stats,training=True)
     #print(neigh.predict(X[0:10]))    #print(neigh.predict_proba(X[0:10]))    #score = clf.score(X_test, y_test)
     print("Training ...")
     # iterate over classifiers

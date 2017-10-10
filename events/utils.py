@@ -24,7 +24,7 @@ def get_all_nuggets_from_folders():
 
 def update_vocab():
     voc = Vocabulary()
-    update_vocab_from_folders()
+    voc.update_vocab_from_folders()
     voc.write_vocab()
 
 def calculate_cooccurance_table():
