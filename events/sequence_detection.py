@@ -93,7 +93,7 @@ def write_results_tbf(events,afters,run_id = "run1"):
             #results = write_results_after_links_random(events, corefs, afters,parents)
         results_str.append("#EndOfDocument")
     print("\n".join(results_str),file=open("results/%s_results.txt" %run_id,"w"))
-    import ipdb ; ipdb.set_trace()
+    #import ipdb ; ipdb.set_trace()
 
 def write_results_after_links_random(events, corefs, afters,parents):
         for a in range(1,4):
@@ -293,6 +293,7 @@ def after_links_as_dictionary(y_pred,IDS_test,events,corefs):
             pairs[from_event_coref].add(to_event_coref)
             afters_pred[doc_id]["R%d" %ind] = [from_event_coref, to_event_coref] #[IDS_test[ind][1],IDS_test[ind][2]]
         old_doc_id = doc_id
+    print("Number of links after cyclic cleanup %d" %len(afters_pred))
     return afters_pred
 
 def post_process_predictions(y_pred,IDS_test,events,corefs,name):
