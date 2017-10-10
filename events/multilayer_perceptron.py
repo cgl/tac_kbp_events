@@ -124,7 +124,7 @@ with tf.Session() as sess:
     recall = TP / (TP + FN)
     f1 = 2 * precision * recall / (precision + recall)
 
-    val_accuracy,precision,recall,f1, y_pred,pred = sess.run([accuracy, precision,recall,f1, y_pred,pred], feed_dict={X: np.array(X_test), Y: one_hot_y(y_test)})
+    val_accuracy,precision,recall,f1, y_pred = sess.run([accuracy, precision,recall,f1, y_pred], feed_dict={X: np.array(X_test), Y: one_hot_y(y_test)})
 
     print("Accuracy:", val_accuracy)
     print("Results:%s\t%s\t%s\n" %(precision,recall,f1))
@@ -132,4 +132,3 @@ with tf.Session() as sess:
     afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events)
     timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
     write_results_tbf(events, afters_pred,run_id="%s-%s" %("Mlp-3Layer",timestamp))
-    print(pred)
