@@ -50,15 +50,17 @@ def calculate_cooccurance_table():
     for nugget in nuggets:
         cooccurence_table[nugget] = defaultdict(int)
 
-    for nugget in nuggets:
+    while nuggets:
+        nugget = nuggets.pop()
         for nugget2 in nuggets:
             ps1 = subprocess.Popen(('grep',nugget,'/datasets/EventRegistry/event.registry.docs'), stdout=subprocess.PIPE)
             ps2 = subprocess.Popen(('grep',nugget2 ), stdin=ps1.stdout,stdout=subprocess.PIPE)
             ps1.stdout.close()
             output = subprocess.check_output(('wc', '-l'), stdin=ps2.stdout)
             ps2.wait()
-            import ipdb ; ipdb.set_trace()
             cooccurence_table[nugget][nugget2] += int(output.strip())
+
+    import ipdb ; ipdb.set_trace()
 
 
 
