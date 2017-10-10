@@ -51,3 +51,8 @@ tramp
 # Org-mode
 .org-id-locations
 *_archive
+
+# Project specific
+results*
+data\/*
+runs\/*

@@ -25,7 +25,7 @@ display_step = 25
 n_hidden_1 = 256 # 1st layer number of neurons
 n_hidden_2 = 256 # 2nd layer number of neurons
 n_hidden_3 = 256 # 2nd layer number of neurons
-n_input = 912 #  data input
+n_input = 614 #  data input
 n_classes = 2 #  total classes
 
 # tf Graph input
@@ -69,6 +69,10 @@ parser = OptionParser()
 parser.add_option('-l','--layer',default=2,type=int,metavar='number_of_layers',help='')
 (options, args) = parser.parse_args()
 
+from sequence_detection import get_dataset
+X_train,y_train,IDS,_ = get_dataset("data/LDC2016E130_training.tbf",training=True)
+X_test,y_test,IDS_test,events = get_dataset("data/LDC2016E130_test.tbf",training=True)
+
 # Construct model
 logits = multilayer_perceptron(X,nol=options.layer)
 
@@ -79,10 +83,6 @@ optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
 train_op = optimizer.minimize(loss_op)
 # Initializing the variables
 init = tf.global_variables_initializer()
-
-from sequence_detection import get_dataset
-X_train,y_train,IDS,_ = get_dataset("data/LDC2016E130_training.tbf",training=True)
-X_test,y_test,IDS_test,events = get_dataset("data/LDC2016E130_test.tbf",training=False)
 
 with tf.Session() as sess:
     sess.run(init)
@@ -103,6 +103,8 @@ with tf.Session() as sess:
         # Display logs per epoch step
         if epoch % display_step == 0:
             print("Epoch:", '%04d' % (epoch+1), "cost={:.9f}".format(avg_cost))
+        if avg_cost >= 1:
+            break
     print("Optimization Finished!")
 
     # Test model
