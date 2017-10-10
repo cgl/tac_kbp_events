@@ -122,7 +122,7 @@ def build_feature_vector(linked_events,events_doc,corefs_doc):
     return x
 
 # 'E211' : {'offsets': '1190,1196', 'nugget': 'merged', 'event_type': 'Business_Merge-Org', 'realis': 'Actual'}
-def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc):
+def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,training=True):
     #print("%s\t%s\t%s\t%s" %(doc_id,len(events_doc),len(corefs_doc),len(afters_doc)))
     #print(set(events_doc))
     X = []
@@ -137,12 +137,17 @@ def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc)
             if 'coref' in events_doc[event_id] and to_event_id in corefs_doc[events_doc[event_id]['coref']]:
                 continue
             linked_event_ids = [event_id,to_event_id]
-            if linked_event_ids in afters_doc.values():
+            x = build_feature_vector(linked_event_ids,events_doc,corefs_doc)
+            is_positive = linked_event_ids in afters_doc.values()
+            if training and is_positive:
+                pass
+            elif x[-1] > 650:
+                continue
+            X.append(x)
+            if is_positive:
                 Y.append(1)
             else:
                 Y.append(0)
-            x = build_feature_vector(linked_event_ids,events_doc,corefs_doc)
-            X.append(x)
             IDS.append([doc_id,linked_event_ids[0],linked_event_ids[1]])
     return X,Y,IDS
 
@@ -183,9 +188,9 @@ def build_feature_matrix_for_dataset(events, corefs, afters,parents,training=Tru
     training_IDS = []
     for doc_id in events.keys():
         if training: #old
-            X,Y, IDS = build_feature_matrix_for_document(doc_id,events[doc_id],corefs[doc_id],afters[doc_id])
+            X,Y, IDS = build_feature_matrix_for_document(doc_id,events[doc_id],corefs[doc_id],afters[doc_id],training=training)
         else:
-            X,Y, IDS = build_feature_matrix_for_document(doc_id,events[doc_id],corefs[doc_id],afters[doc_id])
+            X,Y, IDS = build_feature_matrix_for_document(doc_id,events[doc_id],corefs[doc_id],afters[doc_id],training=training)
         training_X.extend(X)
         training_Y.extend(Y)
         training_IDS.extend(IDS)
@@ -289,7 +294,7 @@ def post_process_predictions(y_pred,IDS_test,events):
 
 def several_classifiers(stats=False):
     X_train,y_train,IDS,_,_ = get_dataset("data/LDC2016E130_training.tbf",stats=stats,training=True)
-    X_test,y_test,IDS_test,events,_ = get_dataset("data/LDC2016E130_test.tbf",stats=stats,training=True)
+    X_test,y_test,IDS_test,events,_ = get_dataset("data/LDC2016E130_test.tbf",stats=stats,training=False)
     #print(neigh.predict(X[0:10]))    #print(neigh.predict_proba(X[0:10]))    #score = clf.score(X_test, y_test)
     print("Training ...")
     # iterate over classifiers
