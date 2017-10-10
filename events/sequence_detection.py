@@ -93,6 +93,7 @@ def write_results_tbf(events,afters,run_id = "run1"):
             #results = write_results_after_links_random(events, corefs, afters,parents)
         results_str.append("#EndOfDocument")
     print("\n".join(results_str),file=open("results/%s_results.txt" %run_id,"w"))
+    import ipdb ; ipdb.set_trace()
 
 def write_results_after_links_random(events, corefs, afters,parents):
         for a in range(1,4):
