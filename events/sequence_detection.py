@@ -165,7 +165,7 @@ def build_feature_matrix_for_document_old(doc_id,events_doc, corefs_doc, afters_
             if random_ids in afters_doc.values():
                 continue
             x = build_feature_vector(random_ids,events_doc,corefs_doc)
-            if x[-1] > 350:
+            if x[-1] > 650:
                 continue
             X.append(x)
             Y.append(0)
@@ -182,8 +182,8 @@ def build_feature_matrix_for_dataset(events, corefs, afters,parents,training=Tru
     training_Y = []
     training_IDS = []
     for doc_id in events.keys():
-        if training:
-            X,Y, IDS = build_feature_matrix_for_document_old(doc_id,events[doc_id],corefs[doc_id],afters[doc_id])
+        if training: #old
+            X,Y, IDS = build_feature_matrix_for_document(doc_id,events[doc_id],corefs[doc_id],afters[doc_id])
         else:
             X,Y, IDS = build_feature_matrix_for_document(doc_id,events[doc_id],corefs[doc_id],afters[doc_id])
         training_X.extend(X)
