@@ -70,8 +70,8 @@ parser.add_option('-l','--layer',default=2,type=int,metavar='number_of_layers',h
 (options, args) = parser.parse_args()
 
 from sequence_detection import get_dataset
-X_train,y_train,IDS,_ = get_dataset("data/LDC2016E130_training.tbf",training=True)
-X_test,y_test,IDS_test,events = get_dataset("data/LDC2016E130_test.tbf",training=True)
+X_train,y_train,IDS,_,_ = get_dataset("data/LDC2016E130_training.tbf",training=True)
+X_test,y_test,IDS_test,events,_ = get_dataset("data/LDC2016E130_test.tbf",training=True)
 
 # Construct model
 logits = multilayer_perceptron(X,nol=options.layer)
