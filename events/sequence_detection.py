@@ -279,13 +279,17 @@ def get_dataset(filename,training=True,stats=False):
 def after_links_as_dictionary(y_pred,IDS_test,events,corefs):
     links_found = [i for i in range(len(y_pred)) if y_pred[i]]
     afters_pred = defaultdict(dict)
-
+    old_doc_id = ""
     for ind in links_found:
         doc_id = IDS_test[ind][0]
+        if old_doc_id != doc_id:
+            pairs = defaultdict(set)
         from_event, to_event = IDS_test[ind][1],IDS_test[ind][2]
-        import ipdb ; ipdb.set_trace()
-        events[doc_id]
-        afters_pred[doc_id]["R%d" %ind] = [IDS_test[ind][1],IDS_test[ind][2]]
+        from_event_coref, to_event_coref = corefs[doc_id][events[doc_id][from_event]['coref']][0], corefs[doc_id][events[doc_id][to_event]['coref']][0]
+        # relation does not exist and reverse relation does not exist
+        if to_event_coref not in pairs[from_event_coref] and from_event_coref not in pairs[to_event_coref]:
+            afters_pred[doc_id]["R%d" %ind] = [IDS_test[ind][1],IDS_test[ind][2]]
+        old_doc_id = doc_id
     return afters_pred
 
 def post_process_predictions(y_pred,IDS_test,events,corefs):
