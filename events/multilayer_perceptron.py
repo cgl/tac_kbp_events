@@ -22,7 +22,7 @@ batch_size = 100
 display_step = 25
 
 # Network Parameters
-n_hidden_1 = 256 # 1st layer number of neurons
+n_hidden_1 = 256*2 # 1st layer number of neurons
 n_hidden_2 = 256 # 2nd layer number of neurons
 n_hidden_3 = 256 # 2nd layer number of neurons
 n_input = 614 #  data input
