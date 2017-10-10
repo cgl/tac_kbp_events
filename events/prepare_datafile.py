@@ -118,20 +118,23 @@ class EmbeddingBank():
             self.update_pickle()
 
     def update_pickle(self):
+        print("Updating pickle for embeddings")
         self.vocab_obj.read_vocab()
+        print("Updating pickle for embeddings: Updated Vocab, Length is %d" %len(self.vocab_obj.vocab))
         self.calculate_vector_list()
+        print("Updating pickle for embeddings: Updated Vector List")
         pickle.dump({'W': self.W , 'W_ind' : self.word_idx_map} , open(self.W_fname,"wb"))
+        print("Updating pickle for embeddings: Pickle Dumped")
 
     def calculate_vector_list(self):
+        print("Updating Vector List")
         dim, self.word_vecs = load_bin_vec(self.vocab_obj.vocab) # fname=FLAGS.w2v_file
         print("Loading idx map...")
         self.W, self.word_idx_map = get_W(self.word_vecs)
+        print("Finished loading idx map...")
 
     def get_index(self,word):
-        if word in self.word_idx_map:
-            ind = self.word_idx_map.get(word)
-        else:
-            ind = 0
+        ind = self.word_idx_map.get(word,0)
         return ind
 
     def get_embedding(self,word):
