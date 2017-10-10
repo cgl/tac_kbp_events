@@ -34,13 +34,9 @@ def get_all_text_from_folders(folder_list):
                     my_parser.feed(source)
     return my_parser.get_text()
 
-def update_vocab_from_folders():
+def update_vocab():
     voc = Vocabulary()
-    training_folder = os.path.join(SEQUENCE_SOURCE_FOLDER,"training")
-    test_folder = os.path.join(SEQUENCE_SOURCE_FOLDER,"test")
-    folder_list = [training_folder,test_folder]
-    text = get_all_text_from_folders(folder_list)
-    voc.update_vocab_from_text(text)
+    update_vocab_from_folders()
     voc.write_vocab()
 
 def calculate_cooccurance_table():
@@ -83,7 +79,7 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     if options.update_vocabulary:
-        update_vocab_from_folders()
+        update_vocab()
     elif options.list_nuggets:
         get_all_nuggets_from_folders()
     elif options.coocurance_table:

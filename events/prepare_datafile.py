@@ -99,6 +99,13 @@ class Vocabulary(object):
                         words = word_tokenize(sent)
                         for word in words:
                             self.vocab[word] += 1
+    def update_vocab_from_folders(self):
+        training_folder = os.path.join(SEQUENCE_SOURCE_FOLDER,"training")
+        test_folder = os.path.join(SEQUENCE_SOURCE_FOLDER,"test")
+        folder_list = [training_folder,test_folder]
+        text = get_all_text_from_folders(folder_list)
+        voc.update_vocab_from_text(text)
+
 
 class EmbeddingBank():
     vocab_obj = Vocabulary()
@@ -120,6 +127,11 @@ class EmbeddingBank():
     def update_pickle(self):
         print("Updating pickle for embeddings")
         self.vocab_obj.read_vocab()
+        if len(self.vocab_obj.vocab) == 0:
+            print("Updating Vocabulary File")
+            self.vocab_obj.update_vocab_from_folders()
+            self.vocab_obj.write_vocab()
+
         print("Updating pickle for embeddings: Updated Vocab, Length is %d" %len(self.vocab_obj.vocab))
         self.calculate_vector_list()
         print("Updating pickle for embeddings: Updated Vector List")
