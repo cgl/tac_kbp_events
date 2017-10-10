@@ -71,12 +71,12 @@ def tokenize_with_span(source_str):
         assert token[0]==source_str[token[1]:token[2]]
 
 class Vocabulary(object):
-    vocab = defaultdict(float)
+    vocab_dict = defaultdict(float)
     vocab_filename = os.path.join(PROJECT_FOLDER,"data/vocab.txt")
 
     def write_vocab(self):
         with open(self.vocab_filename,"w") as v_file:
-            for key, value in self.vocab.items():
+            for key, value in self.vocab_dict.items():
                 v_file.write("%s\t%s\n" % (key,value))
 
     def read_vocab(self):
@@ -109,7 +109,8 @@ class Vocabulary(object):
                     for sent in sentences:
                         words = word_tokenize(sent)
                         for word in words:
-                            self.vocab[word] += 1
+                            self.vocab_dict[word.lower()] += 1
+        self.vocab = self.vocab_dict.keys()
     def update_vocab_from_folders(self):
         training_folder = os.path.join(SEQUENCE_SOURCE_FOLDER,"training")
         test_folder = os.path.join(SEQUENCE_SOURCE_FOLDER,"test")
