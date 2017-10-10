@@ -72,6 +72,7 @@ def tokenize_with_span(source_str):
 
 class Vocabulary(object):
     vocab_dict = defaultdict(float)
+    vocab = []
     vocab_filename = os.path.join(PROJECT_FOLDER,"data/vocab.txt")
 
     def write_vocab(self):
