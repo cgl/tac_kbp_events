@@ -46,6 +46,9 @@ def update_vocab_from_folders():
 def calculate_cooccurance_table():
     print("hello")
     nuggets = get_all_nuggets_from_folders()
+    cooccurence_table = dict()
+    for nugget in nuggets:
+        cooccurence_table[nugget] = defaultdict(int)
 
     for nugget in nuggets:
         for nugget2 in nuggets:
@@ -55,6 +58,7 @@ def calculate_cooccurance_table():
             output = subprocess.check_output(('wc', '-l'), stdin=ps2.stdout)
             ps2.wait()
             import ipdb ; ipdb.set_trace()
+            cooccurence_table[nugget][nugget2] += int(output.strip())
 
 
 
