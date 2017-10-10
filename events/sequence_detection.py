@@ -283,25 +283,26 @@ def after_links_as_dictionary(y_pred,IDS_test,events):
     for ind in links_found:
         doc_id = IDS_test[ind][0]
         from_event, to_event = IDS_test[ind][1],IDS_test[ind][2]
+        import ipdb ; ipdb.set_trace()
         events[doc_id]
         afters_pred[doc_id]["R%d" %ind] = [IDS_test[ind][1],IDS_test[ind][2]]
     return afters_pred
 
-def post_process_predictions(y_pred,IDS_test,events):
+def post_process_predictions(y_pred,IDS_test,events,corefs):
     afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events)
     timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
     write_results_tbf(events, afters_pred,run_id="%s-%s" %(name.replace(" ","-"),timestamp))
 
 def several_classifiers(stats=False):
     X_train,y_train,IDS,_,_ = get_dataset("data/LDC2016E130_training.tbf",stats=stats,training=True)
-    X_test,y_test,IDS_test,events,_ = get_dataset("data/LDC2016E130_test.tbf",stats=stats,training=False)
+    X_test,y_test,IDS_test,events,corefs = get_dataset("data/LDC2016E130_test.tbf",stats=stats,training=False)
     #print(neigh.predict(X[0:10]))    #print(neigh.predict_proba(X[0:10]))    #score = clf.score(X_test, y_test)
     print("Training ...")
     # iterate over classifiers
     for name, clf in zip(names, classifiers):
         clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
-        post_process_predictions(y_pred,IDS_test,events)
+        post_process_predictions(y_pred,IDS_test,events,corefs)
         precision,recall,f1 = precision_score(y_test,y_pred), recall_score(y_test,y_pred), f1_score(y_test,y_pred)
         print("%s: %.4f %.4f %.4f" %(name,precision,recall,f1))
 
