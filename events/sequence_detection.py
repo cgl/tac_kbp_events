@@ -116,6 +116,9 @@ def build_feature_vector(linked_events,events_doc,corefs_doc):
         x.append(event_type_index[etype])
         x.extend([int(x) for x in offsets])
         x.append(realis_index[realis])
+    #add offset distance
+    [e1_id,e2_id] = linked_events
+    x.append(abs(int(events_doc.get(e1_id).get('offsets').split(",")[0])-int(events_doc.get(e2_id).get('offsets').split(",")[0])))
     return x
 
 # 'E211' : {'offsets': '1190,1196', 'nugget': 'merged', 'event_type': 'Business_Merge-Org', 'realis': 'Actual'}
@@ -162,6 +165,8 @@ def build_feature_matrix_for_document_old(doc_id,events_doc, corefs_doc, afters_
             if random_ids in afters_doc.values():
                 continue
             x = build_feature_vector(random_ids,events_doc,corefs_doc)
+            if x[-1] > 400:
+                continue
             X.append(x)
             Y.append(0)
             IDS.append([doc_id,random_ids[0],random_ids[1]])
@@ -178,7 +183,7 @@ def build_feature_matrix_for_dataset(events, corefs, afters,parents,training=Tru
     training_IDS = []
     for doc_id in events.keys():
         if training:
-            X,Y, IDS = build_feature_matrix_for_document(doc_id,events[doc_id],corefs[doc_id],afters[doc_id])
+            X,Y, IDS = build_feature_matrix_for_document_old(doc_id,events[doc_id],corefs[doc_id],afters[doc_id])
         else:
             X,Y, IDS = build_feature_matrix_for_document(doc_id,events[doc_id],corefs[doc_id],afters[doc_id])
         training_X.extend(X)
@@ -187,12 +192,19 @@ def build_feature_matrix_for_dataset(events, corefs, afters,parents,training=Tru
     print("%s set: %s possible links between pairs" %("Training" if training else "Test", len(training_X)))
     return training_X,training_Y, training_IDS
 
-def preprocess_dataset(X):
+def cosine_sim(word_emb1,word_emb2):
+    numerator = np.dot(word_emb1,word_emb2)
+    denominator = np.sqrt(np.sum(word_emb1**2)) * np.sqrt(np.sum(word_emb2**2))
+    print(numerator,denominator,float(numerator/denominator))
+    return float(numerator/denominator)
 
+def preprocess_dataset(X):
     arr_X = np.array(X,dtype=object)
     from prepare_datafile import EmbeddingBank
     emb = EmbeddingBank()
-    emb_sim_column = [emb.get_embedding(arr_X[ind,2])-emb.get_embedding(arr_X[ind,7]) for ind in range(arr_X.shape[0])]
+    #emb_sim_column = [emb.get_embedding(arr_X[ind,2])-emb.get_embedding(arr_X[ind,7]) for ind in range(arr_X.shape[0])]
+
+    emb_sim_column = [cosine_sim(emb.get_embedding(arr_X[ind,2]),emb.get_embedding(arr_X[ind,7])) for ind in range(arr_X.shape[0])]
 
     for i in [2,7]:
         emb_column = [emb.get_embedding(arr_X[ind,i]) for ind in range(arr_X.shape[0])]
@@ -273,7 +285,7 @@ def post_process_predictions(y_pred,IDS_test,events):
 
 def several_classifiers(stats=False):
     X_train,y_train,IDS,_ = get_dataset("data/LDC2016E130_training.tbf",stats=stats,training=True)
-    X_test,y_test,IDS_test,events = get_dataset("data/LDC2016E130_test.tbf",stats=stats,training=False)
+    X_test,y_test,IDS_test,events = get_dataset("data/LDC2016E130_test.tbf",stats=stats,training=True)
     #print(neigh.predict(X[0:10]))    #print(neigh.predict_proba(X[0:10]))    #score = clf.score(X_test, y_test)
     print("Training ...")
     # iterate over classifiers
@@ -290,6 +302,8 @@ if __name__ == "__main__":
     parser.add_option('-m','--main',default=False,action="store_true",help='')
     parser.add_option('-s','--statistics',default=False,action="store_true",help='')
     parser.add_option('-d','--debug',default=False,action="store_true",help='')
+    #parser.add_option('-d','--debug',default=False,action="store_true",help='')
+
     parser.add_option("-f", "--file", dest="filename",
                       help="write report to FILE", metavar="FILE")
     parser.add_option("-q", "--quiet",
