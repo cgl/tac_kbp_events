@@ -276,7 +276,7 @@ def get_dataset(filename,training=True,stats=False):
     X_train = preprocess_dataset(X_train)
     return X_train,y_train,IDS, events,corefs
 
-def after_links_as_dictionary(y_pred,IDS_test,events):
+def after_links_as_dictionary(y_pred,IDS_test,events,corefs):
     links_found = [i for i in range(len(y_pred)) if y_pred[i]]
     afters_pred = defaultdict(dict)
 
@@ -289,7 +289,7 @@ def after_links_as_dictionary(y_pred,IDS_test,events):
     return afters_pred
 
 def post_process_predictions(y_pred,IDS_test,events,corefs):
-    afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events)
+    afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events,corefs)
     timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
     write_results_tbf(events, afters_pred,run_id="%s-%s" %(name.replace(" ","-"),timestamp))
 
