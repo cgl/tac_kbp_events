@@ -1,6 +1,7 @@
 from collections import defaultdict
 from optparse import OptionParser
 from sequence_detection import get_dataset
+import numpy as np
 import os,pickle
 
 def preview_nuggets(stats=False):
@@ -46,10 +47,12 @@ def print_cooccurance_for_positives():
         print("Reading from file")
         pickled = pickle.load(open(pickle_file,"rb"))
     import ipdb ; ipdb.set_trace()
-    """
+
     IDS.extend(IDS_test)
     events.update(events_test)
     Y = y_train + y_test
+    X = np.append(X_train,X_test,axis=0).shape
+
     for ind,(doc_id,e1_id,e2_id) in enumerate(IDS):
         if Y[ind]:
     """
