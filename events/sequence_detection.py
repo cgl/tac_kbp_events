@@ -141,7 +141,7 @@ def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,
             is_positive = linked_event_ids in afters_doc.values()
             if training and is_positive:
                 pass
-            elif x[-1] > 650:
+            elif x[-1] > 600:
                 continue
             X.append(x)
             if is_positive:
@@ -292,7 +292,7 @@ def after_links_as_dictionary(y_pred,IDS_test,events,corefs):
         old_doc_id = doc_id
     return afters_pred
 
-def post_process_predictions(y_pred,IDS_test,events,corefs):
+def post_process_predictions(y_pred,IDS_test,events,corefs,name):
     afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events,corefs)
     timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
     write_results_tbf(events, afters_pred,run_id="%s-%s" %(name.replace(" ","-"),timestamp))
@@ -306,7 +306,7 @@ def several_classifiers(stats=False):
     for name, clf in zip(names, classifiers):
         clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
-        post_process_predictions(y_pred,IDS_test,events,corefs)
+        post_process_predictions(y_pred,IDS_test,events,corefs,name)
         precision,recall,f1 = precision_score(y_test,y_pred), recall_score(y_test,y_pred), f1_score(y_test,y_pred)
         print("%s: %.4f %.4f %.4f" %(name,precision,recall,f1))
 

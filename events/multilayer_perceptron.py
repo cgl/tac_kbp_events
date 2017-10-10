@@ -71,7 +71,7 @@ parser.add_option('-l','--layer',default=2,type=int,metavar='number_of_layers',h
 
 from sequence_detection import get_dataset
 X_train,y_train,IDS,_,_ = get_dataset("data/LDC2016E130_training.tbf",training=True)
-X_test,y_test,IDS_test,events,_ = get_dataset("data/LDC2016E130_test.tbf",training=True)
+X_test,y_test,IDS_test,events,corefs = get_dataset("data/LDC2016E130_test.tbf",training=True)
 
 # Construct model
 logits = multilayer_perceptron(X,nol=options.layer)
@@ -129,6 +129,6 @@ with tf.Session() as sess:
     print("Accuracy:", val_accuracy)
     print("Results:%s\t%s\t%s\n" %(precision,recall,f1))
 
-    afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events)
+    afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events,corefs)
     timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
     write_results_tbf(events, afters_pred,run_id="%s-%s" %("Mlp-3Layer",timestamp))
