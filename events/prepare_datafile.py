@@ -53,7 +53,7 @@ def spans(txt):
             offset = txt.find(token, offset)
             yield token, offset, offset+len(token)
             offset += len(token)
-
+import source_parser as html_parser
 def get_all_text_from_folders(folder_list):
     my_parser = html_parser.MyHTMLParser()
     for folder in folder_list:
