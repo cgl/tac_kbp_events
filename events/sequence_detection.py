@@ -216,7 +216,7 @@ def preprocess_dataset(X):
         arr_X = np.append(arr_X,np.array(emb_column),1)
 
     #arr_X = np.append(arr_X,np.array(emb_sim_column),1)
-    arr_X = np.append(arr_X,np.array(emb_sim_column).reshape(3785,1),1)
+    arr_X = np.append(arr_X,np.array(emb_sim_column).reshape(len(emb_sim_column),1),1)
     return arr_X
 
 def main(debug=False):
