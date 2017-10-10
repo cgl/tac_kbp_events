@@ -208,7 +208,7 @@ def preprocess_dataset(X):
     #emb_sim_column = [emb.get_embedding(arr_X[ind,2])-emb.get_embedding(arr_X[ind,7]) for ind in range(arr_X.shape[0])]
 
     emb_sim_column = [cosine_sim(emb.get_embedding(arr_X[ind,2]),emb.get_embedding(arr_X[ind,7])) for ind in range(arr_X.shape[0])]
-
+    import ipdb ; ipdb.set_trace()
     for i in [2,7]:
         emb_column = [emb.get_embedding(arr_X[ind,i]) for ind in range(arr_X.shape[0])]
         ind_column = [emb.get_index(arr_X[ind,i]) for ind in range(arr_X.shape[0])]
