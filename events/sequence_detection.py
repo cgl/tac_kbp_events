@@ -142,6 +142,8 @@ def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,
             is_positive = linked_event_ids in afters_doc.values()
             if training and is_positive:
                 pass
+            elif training and x[-1] > 300:
+                continue
             elif x[-1] > 600:
                 continue
             X.append(x)
