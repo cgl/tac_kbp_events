@@ -279,6 +279,7 @@ def get_dataset(filename,training=True,stats=False):
 
 def after_links_as_dictionary(y_pred,IDS_test,events,corefs):
     links_found = [i for i in range(len(y_pred)) if y_pred[i]]
+    print("Number of links found %d" %len(links_foun))
     afters_pred = defaultdict(dict)
     old_doc_id = ""
     for ind in links_found:
@@ -289,7 +290,7 @@ def after_links_as_dictionary(y_pred,IDS_test,events,corefs):
         from_event_coref, to_event_coref = corefs[doc_id][events[doc_id][from_event]['coref']][0], corefs[doc_id][events[doc_id][to_event]['coref']][0]
         # relation does not exist and reverse relation does not exist
         if to_event_coref not in pairs[from_event_coref] and from_event_coref not in pairs[to_event_coref]:
-            pairs[from_event_coref].append(to_event_coref)
+            pairs[from_event_coref].add(to_event_coref)
             afters_pred[doc_id]["R%d" %ind] = [from_event_coref, to_event_coref] #[IDS_test[ind][1],IDS_test[ind][2]]
         old_doc_id = doc_id
     return afters_pred
