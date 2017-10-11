@@ -133,7 +133,7 @@ def get_coref_links(linked_event_ids,events_doc, corefs_doc,doc_id):
         fro = from_event_corefs.pop()
         for to in to_event_corefs:
             coref_links.append([fro,to])
-            coref_links_negatives([to,fro])
+            coref_links_negatives.append([to,fro])
     return coref_links,coref_links_negatives
 
 # 'E211' : {'offsets': '1190,1196', 'nugget': 'merged', 'event_type': 'Business_Merge-Org', 'realis': 'Actual'}
@@ -152,7 +152,7 @@ def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,
             distance = abs(int(events_doc.get(event_id).get('offsets').split(",")[0]) - int(events_doc.get(to_event_id).get('offsets').split(",")[0]))
             if training and is_positive:
                 pass
-            elif training and distance > 100:
+            elif training and distance > 80:
                 continue
             elif distance > 500:
                 continue
