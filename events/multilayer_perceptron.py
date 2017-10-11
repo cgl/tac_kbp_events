@@ -65,7 +65,7 @@ def multilayer_perceptron(x,nol=2):
     out_layer = tf.matmul(latest_layer, weights['out']) + biases['out']
     return out_layer
 
-def run(X_train,y_train,X_test,y_test):
+def run(X_train,y_train,X_test,y_test,name):
     # Construct model
     logits = multilayer_perceptron(X,nol=options.layer)
 
@@ -126,7 +126,7 @@ def run(X_train,y_train,X_test,y_test):
 
         afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events,corefs)
         timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
-        write_results_tbf(events, afters_pred,run_id="%s-%s" %("Mlp-3Layer",timestamp))
+        write_results_tbf(events, afters_pred,run_id="%s-%s-%s" %("Mlp-3Layer",name,timestamp))
 
         ############
 parser = OptionParser()
@@ -138,5 +138,8 @@ training_epochs = options.epochs
 from sequence_detection import get_dataset
 X_train,y_train,IDS,_,_ = get_dataset("data/LDC2016E130_training.tbf",training=True)
 X_test,y_test,IDS_test,events,corefs = get_dataset("data/LDC2016E130_test.tbf",training=False)
+run(X_train,y_train,X_test,y_test,name="Test")
 
-run(X_train,y_train,X_test,y_test)
+X_train,y_train,IDS,_,_ = get_dataset("data/LDC2016E130_all.tbf",training=True)
+X_test,y_test,IDS_test,events,corefs = get_dataset("data/Sequence_2017_test.tbf",training=False)
+run(X_train,y_train,X_test,y_test,name="Eval")

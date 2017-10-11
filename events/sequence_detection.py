@@ -152,7 +152,8 @@ def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,
             distance = abs(int(events_doc.get(event_id).get('offsets').split(",")[0]) - int(events_doc.get(to_event_id).get('offsets').split(",")[0]))
             if training and is_positive:
                 pass
-            elif training and not ( distance > 50  or 60 > distance > 80 or 90 > distance > 120 or 180 > distance > 200):
+            elif training and distance > 80:
+                #not ( distance > 50  or 60 > distance > 80 or 90 > distance > 110 or 180 > distance > 200):
                 continue
             elif distance > 500:
                 continue
@@ -340,7 +341,7 @@ def after_links_as_dictionary(y_pred,IDS_test,events,corefs):
 
 def post_process_predictions(y_pred,IDS_test,events,corefs,name):
     afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events,corefs)
-    timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
+    timestamp = datetime.datetime.now().strftime("%m%d-%H%M%S")
     write_results_tbf(events, afters_pred,run_id="%s-%s" %(name.replace(" ","-"),timestamp))
 
 def several_classifiers(stats=False):
