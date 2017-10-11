@@ -1,7 +1,9 @@
 from collections import defaultdict
 
 import datetime,nltk,os, numpy as np
+import logging,random
 from data_conf import PROJECT_FOLDER, event_type_index, realis_index
+from optparse import OptionParser
 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
@@ -15,9 +17,6 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 
 from sklearn.metrics import recall_score, precision_score, f1_score
 
-from optparse import OptionParser
-
-import random
 
 """
 python2 ~/work/EvmEval/util/brat2tbf.py -d /Users/cagil/work/tac_kbp_events/data/LDC2016E130_DEFT_Event_Sequencing_After_Link_Parent_Child_Annotation_Training_Data_V4/data/training/ -o /Users/cagil/work/tac_kbp_events/data/LDC2016E130_training
@@ -322,16 +321,20 @@ def after_links_as_dictionary(y_pred,IDS_test,events,corefs):
         doc_id = IDS_test[ind][0]
         if old_doc_id != doc_id:
             pairs = defaultdict(set)
-        from_event, to_event = IDS_test[ind][1],IDS_test[ind][2]
-        from_event_corefs = corefs[doc_id][events[doc_id][from_event]['coref']]
-        to_event_corefs = corefs[doc_id][events[doc_id][to_event]['coref']][0]
-        from_event_coref = from_event_corefs[0] if from_event_corefs else from_event
-        to_event_coref = to_event_corefs[0] if to_event_corefs else to_event
+        try:
+            from_event, to_event = IDS_test[ind][1],IDS_test[ind][2]
+            from_event_corefs = corefs[doc_id][events[doc_id][from_event]['coref']]
+            to_event_corefs = corefs[doc_id][events[doc_id][to_event]['coref']][0]
+            from_event_coref = from_event_corefs[0] if from_event_corefs else from_event
+            to_event_coref = to_event_corefs[0] if to_event_corefs else to_event
 
-        # relation does not exist and reverse relation does not exist
-        if to_event_coref not in pairs[from_event_coref] and from_event_coref not in pairs[to_event_coref]:
-            pairs[from_event_coref].add(to_event_coref)
-            afters_pred[doc_id]["R%d" %ind] = [from_event_coref, to_event_coref] #[IDS_test[ind][1],IDS_test[ind][2]]
+            # relation does not exist and reverse relation does not exist
+            if to_event_coref not in pairs[from_event_coref] and from_event_coref not in pairs[to_event_coref]:
+                pairs[from_event_coref].add(to_event_coref)
+                afters_pred[doc_id]["R%d" %ind] = [from_event_coref, to_event_coref] #[IDS_test[ind][1],IDS_test[ind][2]]
+        except Exception as e:
+            logging.exception(e)
+            import ipdb ; ipdb.set_trace()
         old_doc_id = doc_id
     print("Number of links after cyclic cleanup %d" %len(afters_pred))
     return afters_pred
