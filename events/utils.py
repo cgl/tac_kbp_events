@@ -28,12 +28,8 @@ def update_vocab():
     voc.write_vocab()
 
 def calculate_cooccurance_table():
-    print("hello")
     nuggets = get_all_nuggets_from_folders()
-    cooccurence_table = dict()
-    for nugget in nuggets:
-        cooccurence_table[nugget] = defaultdict(int)
-
+    cooccurence_table = defaultdict(dict)
     while nuggets:
         nugget = nuggets.pop()
         for nugget2 in nuggets:
@@ -42,11 +38,9 @@ def calculate_cooccurance_table():
             ps1.stdout.close()
             output = subprocess.check_output(('wc', '-l'), stdin=ps2.stdout)
             ps2.wait()
-            cooccurence_table[nugget][nugget2] += int(output.strip())
-
-    import ipdb ; ipdb.set_trace()
-
-
+            cooccurence_table[nugget][nugget2] = cooccurence_table[nugget].get(nugget2,0) + int(output.strip())
+        print(cooccurence_table[nugget])
+        pickle.dump(cooccurence_table , open("../data/cooccurance_table.pickle","wb"))
 
 def update_embeddings():
     emb = EmbeddingBank()
