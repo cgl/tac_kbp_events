@@ -17,7 +17,7 @@ from optparse import OptionParser
 from sequence_detection import after_links_as_dictionary,write_results_tbf
 # Parameters
 learning_rate = 0.001
-training_epochs = 15
+training_epochs = 150
 batch_size = 100
 display_step = 1
 
