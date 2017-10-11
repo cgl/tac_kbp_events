@@ -324,7 +324,7 @@ def after_links_as_dictionary(y_pred,IDS_test,events,corefs):
         try:
             from_event, to_event = IDS_test[ind][1],IDS_test[ind][2]
             from_event_corefs = corefs[doc_id][events[doc_id][from_event]['coref']]
-            to_event_corefs = corefs[doc_id][events[doc_id][to_event]['coref']][0]
+            to_event_corefs = corefs[doc_id][events[doc_id][to_event]['coref']]
             from_event_coref = from_event_corefs[0] if from_event_corefs else from_event
             to_event_coref = to_event_corefs[0] if to_event_corefs else to_event
 
