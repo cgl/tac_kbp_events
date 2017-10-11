@@ -152,7 +152,7 @@ def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,
             distance = abs(int(events_doc.get(event_id).get('offsets').split(",")[0]) - int(events_doc.get(to_event_id).get('offsets').split(",")[0]))
             if training and is_positive:
                 pass
-            elif training and distance > 80:
+            elif training and not (60 > distance > 80 or 10 > distance > 20  or 180 > distance > 200):
                 continue
             elif distance > 500:
                 continue
