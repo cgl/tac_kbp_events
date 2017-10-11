@@ -65,6 +65,70 @@ def multilayer_perceptron(x,nol=2):
     out_layer = tf.matmul(latest_layer, weights['out']) + biases['out']
     return out_layer
 
+def run(X_train,y_train,X_test,y_test):
+    # Construct model
+    logits = multilayer_perceptron(X,nol=options.layer)
+
+    # Define loss and optimizer
+    loss_op = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
+        logits=logits, labels=Y))
+    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+    train_op = optimizer.minimize(loss_op)
+    # Initializing the variables
+    init = tf.global_variables_initializer()
+
+    with tf.Session() as sess:
+        sess.run(init)
+
+        # Training cycle
+        for epoch in range(training_epochs):
+            avg_cost = 0.
+            total_batch = int(len(X_train)/batch_size)
+            # Loop over all batches
+            for i in range(total_batch):
+                batch_x = np.array(X_train[i*batch_size:(i*batch_size)+batch_size])
+                batch_y = one_hot_y(y_train[i*batch_size:(i*batch_size)+batch_size])
+                # Run optimization op (backprop) and cost op (to get loss value)
+                _, c = sess.run([train_op, loss_op], feed_dict={X: batch_x,
+                                                                Y: batch_y})
+                # Compute average loss
+                avg_cost += c / total_batch
+            # Display logs per epoch step
+            if epoch % display_step == 0:
+                print("Epoch:", '%04d' % (epoch+1), "cost={:.9f}".format(avg_cost))
+            if avg_cost <= 250:
+                print("Epoch:", '%04d' % (epoch+1), "cost={:.9f}".format(avg_cost))
+                break
+        print("Optimization Finished!")
+
+        # Test model
+        pred = tf.nn.softmax(logits)  # Apply softmax to logits
+        y_pred = tf.argmax(pred, 1)
+        y_true = tf.argmax(Y, 1)
+        correct_prediction = tf.equal(y_pred, tf.argmax(Y, 1))
+        # Calculate accuracy
+        accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+
+        TP = tf.count_nonzero(y_pred * y_true, dtype=tf.float32)
+        TN = tf.count_nonzero((y_pred - 1) * (y_true - 1), dtype=tf.float32)
+        FP = tf.count_nonzero(y_pred * (y_true - 1), dtype=tf.float32)
+        FN = tf.count_nonzero((y_pred - 1) * y_true, dtype=tf.float32)
+
+        precision = TP / (TP + FP)
+        recall = TP / (TP + FN)
+        f1 = 2 * precision * recall / (precision + recall)
+
+        ###########
+        val_accuracy,precision,recall,f1, y_pred = sess.run([accuracy, precision,recall,f1, y_pred], feed_dict={X: np.array(X_test), Y: one_hot_y(y_test)})
+
+        print("Accuracy:", val_accuracy)
+        print("Results:%s\t%s\t%s\n" %(precision,recall,f1))
+
+        afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events,corefs)
+        timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
+        write_results_tbf(events, afters_pred,run_id="%s-%s" %("Mlp-3Layer",timestamp))
+
+        ############
 parser = OptionParser()
 parser.add_option('-l','--layer',default=2,type=int,metavar='number_of_layers',help='')
 parser.add_option('-e','--epochs',default=training_epochs,type=int,metavar='training_epochs',help='')
@@ -75,63 +139,4 @@ from sequence_detection import get_dataset
 X_train,y_train,IDS,_,_ = get_dataset("data/LDC2016E130_training.tbf",training=True)
 X_test,y_test,IDS_test,events,corefs = get_dataset("data/LDC2016E130_test.tbf",training=False)
 
-# Construct model
-logits = multilayer_perceptron(X,nol=options.layer)
-
-# Define loss and optimizer
-loss_op = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
-    logits=logits, labels=Y))
-optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
-train_op = optimizer.minimize(loss_op)
-# Initializing the variables
-init = tf.global_variables_initializer()
-
-with tf.Session() as sess:
-    sess.run(init)
-
-    # Training cycle
-    for epoch in range(training_epochs):
-        avg_cost = 0.
-        total_batch = int(len(X_train)/batch_size)
-        # Loop over all batches
-        for i in range(total_batch):
-            batch_x = np.array(X_train[i*batch_size:(i*batch_size)+batch_size])
-            batch_y = one_hot_y(y_train[i*batch_size:(i*batch_size)+batch_size])
-            # Run optimization op (backprop) and cost op (to get loss value)
-            _, c = sess.run([train_op, loss_op], feed_dict={X: batch_x,
-                                                            Y: batch_y})
-            # Compute average loss
-            avg_cost += c / total_batch
-        # Display logs per epoch step
-        if epoch % display_step == 0:
-            print("Epoch:", '%04d' % (epoch+1), "cost={:.9f}".format(avg_cost))
-        if avg_cost <= 250:
-            print("Epoch:", '%04d' % (epoch+1), "cost={:.9f}".format(avg_cost))
-            break
-    print("Optimization Finished!")
-
-    # Test model
-    pred = tf.nn.softmax(logits)  # Apply softmax to logits
-    y_pred = tf.argmax(pred, 1)
-    y_true = tf.argmax(Y, 1)
-    correct_prediction = tf.equal(y_pred, tf.argmax(Y, 1))
-    # Calculate accuracy
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-
-    TP = tf.count_nonzero(y_pred * y_true, dtype=tf.float32)
-    TN = tf.count_nonzero((y_pred - 1) * (y_true - 1), dtype=tf.float32)
-    FP = tf.count_nonzero(y_pred * (y_true - 1), dtype=tf.float32)
-    FN = tf.count_nonzero((y_pred - 1) * y_true, dtype=tf.float32)
-
-    precision = TP / (TP + FP)
-    recall = TP / (TP + FN)
-    f1 = 2 * precision * recall / (precision + recall)
-
-    val_accuracy,precision,recall,f1, y_pred = sess.run([accuracy, precision,recall,f1, y_pred], feed_dict={X: np.array(X_test), Y: one_hot_y(y_test)})
-
-    print("Accuracy:", val_accuracy)
-    print("Results:%s\t%s\t%s\n" %(precision,recall,f1))
-
-    afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events,corefs)
-    timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
-    write_results_tbf(events, afters_pred,run_id="%s-%s" %("Mlp-3Layer",timestamp))
+run(X_train,y_train,X_test,y_test)
