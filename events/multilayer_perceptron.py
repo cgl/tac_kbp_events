@@ -19,7 +19,7 @@ from sequence_detection import after_links_as_dictionary,write_results_tbf
 learning_rate = 0.001
 training_epochs = 350
 batch_size = 100
-display_step = 25
+display_step = 1
 
 # Network Parameters
 n_hidden_1 = 256*2 # 1st layer number of neurons
@@ -103,7 +103,8 @@ with tf.Session() as sess:
         # Display logs per epoch step
         if epoch % display_step == 0:
             print("Epoch:", '%04d' % (epoch+1), "cost={:.9f}".format(avg_cost))
-        if avg_cost >= 1:
+        if avg_cost <= 0.1:
+            print("Epoch:", '%04d' % (epoch+1), "cost={:.9f}".format(avg_cost))
             break
     print("Optimization Finished!")
 
