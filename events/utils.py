@@ -1,5 +1,5 @@
 from collections import defaultdict
-import os,pprint,subprocess
+import os, pickle, pprint, subprocess
 from prepare_datafile import Vocabulary, EmbeddingBank
 from data_conf import SEQUENCE_SOURCE_FOLDER, PROJECT_FOLDER
 from sequence_detection import read_annotations
