@@ -122,7 +122,23 @@ def build_feature_vector(linked_events,events_doc,corefs_doc):
     x.append(abs(int(events_doc.get(e1_id).get('offsets').split(",")[0])-int(events_doc.get(e2_id).get('offsets').split(",")[0])))
     return x
 def get_coref_links(linked_event_ids,events_doc, corefs_doc,doc_id):
-    return []
+    [from_event, to_event] = linked_event_ids
+    from_event_corefs, to_event_corefs = corefs_doc[events_doc[from_event]['coref']], corefs_doc[events_doc[to_event]['coref']]
+    try:
+        from_event_corefs.remove(from_event)
+    except ValueError:
+        pass
+    try:
+        to_event_corefs.remove(to_event)
+    except ValueError:
+        pass
+    coref_links = []
+    while from_event_corefs:
+        fro = from_event_corefs.pop()
+        for to in to_event_corefs:
+            coref_links.append([fro,to])
+    return coref_links
+
 # 'E211' : {'offsets': '1190,1196', 'nugget': 'merged', 'event_type': 'Business_Merge-Org', 'realis': 'Actual'}
 def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,training=True):
     #print("%s\t%s\t%s\t%s" %(doc_id,len(events_doc),len(corefs_doc),len(afters_doc)))
@@ -164,6 +180,12 @@ def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,
             X.append(x)
             Y.append(0)
             IDS.append([doc_id,linked_event_ids[0],linked_event_ids[1]])
+    for linked_event_ids in coref_positives:
+        x = build_feature_vector(linked_event_ids,events_doc,corefs_doc)
+        X.append(x)
+        Y.append(1)
+        IDS.append([doc_id,linked_event_ids[0],linked_event_ids[1]])
+
     return X,Y,IDS
 
 def build_feature_matrix_for_document_old(doc_id,events_doc, corefs_doc, afters_doc,add_neg=True):
