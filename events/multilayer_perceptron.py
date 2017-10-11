@@ -67,7 +67,9 @@ def multilayer_perceptron(x,nol=2):
 
 parser = OptionParser()
 parser.add_option('-l','--layer',default=2,type=int,metavar='number_of_layers',help='')
+parser.add_option('-e','--epochs',default=training_epochs,type=int,metavar='training_epochs',help='')
 (options, args) = parser.parse_args()
+training_epochs = options.epochs
 
 from sequence_detection import get_dataset
 X_train,y_train,IDS,_,_ = get_dataset("data/LDC2016E130_training.tbf",training=True)
