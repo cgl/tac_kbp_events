@@ -121,7 +121,8 @@ def build_feature_vector(linked_events,events_doc,corefs_doc):
     [e1_id,e2_id] = linked_events
     x.append(abs(int(events_doc.get(e1_id).get('offsets').split(",")[0])-int(events_doc.get(e2_id).get('offsets').split(",")[0])))
     return x
-
+def get_coref_links(linked_event_ids,events_doc, corefs_doc,doc_id):
+    return []
 # 'E211' : {'offsets': '1190,1196', 'nugget': 'merged', 'event_type': 'Business_Merge-Org', 'realis': 'Actual'}
 def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,training=True):
     #print("%s\t%s\t%s\t%s" %(doc_id,len(events_doc),len(corefs_doc),len(afters_doc)))
@@ -130,27 +131,38 @@ def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,
     Y=[]
     IDS = []
     event_id_list = set(events_doc.keys())
-
+    coref_positives,negatives = [],[]
     for event_id in event_id_list:
         for to_event_id in event_id_list:
-            #import ipdb ; ipdb.set_trace()
-            # no link definitions between corefs
-            if 'coref' in events_doc[event_id] and to_event_id in corefs_doc[events_doc[event_id]['coref']]:
-                continue
             linked_event_ids = [event_id,to_event_id]
-            x = build_feature_vector(linked_event_ids,events_doc,corefs_doc)
             is_positive = linked_event_ids in afters_doc.values()
+            distance = abs(int(events_doc.get(event_id).get('offsets').split(",")[0]) - int(events_doc.get(to_event_id).get('offsets').split(",")[0]))
             if training and is_positive:
                 pass
-            elif training and x[-1] > 300:
+            elif training and distance > 100:
                 continue
-            elif x[-1] > 600:
+            elif distance > 500:
                 continue
-            X.append(x)
             if is_positive:
+
+                coref_positives.extend(get_coref_links(linked_event_ids,events_doc, corefs_doc,doc_id))
+
+                x = build_feature_vector(linked_event_ids,events_doc,corefs_doc)
+                X.append(x)
                 Y.append(1)
+                IDS.append([doc_id,linked_event_ids[0],linked_event_ids[1]])
+            # no link definitions between corefs
+            elif 'coref' in events_doc[event_id] and to_event_id in corefs_doc[events_doc[event_id]['coref']]:
+                continue
             else:
-                Y.append(0)
+                negatives.append(linked_event_ids)
+
+    #add negatives if not in corefs
+    for linked_event_ids in negatives:
+        if linked_event_ids not in coref_positives:
+            x = build_feature_vector(linked_event_ids,events_doc,corefs_doc)
+            X.append(x)
+            Y.append(0)
             IDS.append([doc_id,linked_event_ids[0],linked_event_ids[1]])
     return X,Y,IDS
 
