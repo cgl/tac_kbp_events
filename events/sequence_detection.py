@@ -17,6 +17,8 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 
 from sklearn.metrics import recall_score, precision_score, f1_score
 
+# References:
+# http://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html
 
 """
 python2 ~/work/EvmEval/util/brat2tbf.py -d /Users/cagil/work/tac_kbp_events/data/LDC2016E130_DEFT_Event_Sequencing_After_Link_Parent_Child_Annotation_Training_Data_V4/data/training/ -o /Users/cagil/work/tac_kbp_events/data/LDC2016E130_training
@@ -269,20 +271,22 @@ def main(debug=False):
     #for line in events:
     #    print(line)
 
-names = ["Nearest Neighbors", "Linear SVM", "RBF SVM", "Gaussian Process",
+names = ["Nearest Neighbors",
+         "Gaussian Process",
          "Decision Tree", "Random Forest", "Neural Net", "AdaBoost",
-         "Naive Bayes", "QDA"]
+         "Naive Bayes", "QDA",
+         "Linear SVM","RBF SVM"]
 classifiers = [
     KNeighborsClassifier(3),
-    SVC(kernel="linear", C=0.025),
-    SVC(gamma=2, C=1),
     GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True),
     DecisionTreeClassifier(max_depth=5),
     RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
     MLPClassifier(alpha=1),
     AdaBoostClassifier(),
     GaussianNB(),
-    QuadraticDiscriminantAnalysis()
+    QuadraticDiscriminantAnalysis(),
+    SVC(kernel="linear", C=0.025),
+    SVC(gamma=2, C=1),
 ]
 
 def get_stats(events, corefs, afters, parents,X_train,y_train,IDS):
