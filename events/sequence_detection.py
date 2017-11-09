@@ -174,7 +174,7 @@ def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,
 
     #add negatives if not in corefs
     for ind,linked_event_ids in enumerate(negatives):
-        if training and ind % 15 != 0:
+        if training and ind % 30 != 0:
             continue
         if linked_event_ids not in coref_positives:
             x = build_feature_vector(linked_event_ids,events_doc,corefs_doc)

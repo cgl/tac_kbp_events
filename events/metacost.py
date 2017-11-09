@@ -10,6 +10,7 @@ from sklearn.neighbors import KNeighborsClassifier
 
 def mp_worker(dataset):
     clf = KNeighborsClassifier(4).fit(dataset[0],dataset[1])
+    print("Finished working")
     return clf
 
 def mp_handler(data):
