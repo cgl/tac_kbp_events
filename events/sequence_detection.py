@@ -152,13 +152,11 @@ def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,
             linked_event_ids = [event_id,to_event_id]
             is_positive = linked_event_ids in afters_doc.values()
             distance = abs(int(events_doc.get(event_id).get('offsets').split(",")[0]) - int(events_doc.get(to_event_id).get('offsets').split(",")[0]))
-            if training and is_positive:
-                pass
-            elif training and distance > 80:
-                #not ( distance > 50  or 60 > distance > 80 or 90 > distance > 110 or 180 > distance > 200):
+            # eliminate all pairs with a distance larger than 500 if not (in afters list and training)
+            if not (training and is_positive) and distance > 500:
                 continue
-            elif distance > 500:
-                continue
+
+            # add all annotations and their positive and negative extensions
             if is_positive:
                 coref_links, coref_links_negatives = get_coref_links(linked_event_ids,events_doc, corefs_doc,doc_id)
                 coref_positives.extend(coref_links)
@@ -175,7 +173,9 @@ def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,
                 negatives.append(linked_event_ids)
 
     #add negatives if not in corefs
-    for linked_event_ids in negatives:
+    for ind,linked_event_ids in enumerate(negatives):
+        if training and ind % 15 != 0:
+            continue
         if linked_event_ids not in coref_positives:
             x = build_feature_vector(linked_event_ids,events_doc,corefs_doc)
             X.append(x)

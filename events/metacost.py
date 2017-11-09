@@ -4,7 +4,7 @@ from data_conf import PROJECT_FOLDER, event_type_index, realis_index
 
 import multiprocessing
 
-from sequence_detection import get_dataset
+from sequence_detection import get_dataset,post_process_predictions
 from sklearn.metrics import recall_score, precision_score, f1_score
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -49,7 +49,7 @@ def metacost(clf,m=10,n=100,r=2,
         P_j_x[1] = sum([clfs[i].predict([X_test[ind]])[0] == 1  for i in range(m)]) / m
         y_pred[ind] = np.argmin([ P_j_x[0]*C[0,0] + P_j_x[1]*C[0,1],
                                   P_j_x[0]*C[1,0] + P_j_x[1]*C[1,1]])
-    import ipdb ; ipdb.set_trace()
-    post_process_predictions(y_pred,IDS_test,events,corefs,name)
+    post_process_predictions(y_pred,IDS_test,events,corefs,"metacost")
     precision,recall,f1 = precision_score(y_test,y_pred), recall_score(y_test,y_pred), f1_score(y_test,y_pred)
-    print("%s: %.4f %.4f %.4f" %(name,precision,recall,f1))
+    import ipdb ; ipdb.set_trace()
+    print("%s: %.4f %.4f %.4f" %("metacost",precision,recall,f1))
