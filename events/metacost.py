@@ -18,7 +18,7 @@ def mp_handler(data):
     clfs = p.map(mp_worker, data)
     return clfs
 
-def metacost(clf,m=10,n=100,r=2,
+def metacost(clf,m=10,n=1000,r=2,
              training_tbf_filename="data/LDC2016E130_training.tbf",
              test_tbf_filename="data/LDC2016E130_test.tbf"):
     X_train,y_train,IDS,_,_ = get_dataset(training_tbf_filename,training=True)
@@ -33,6 +33,12 @@ def metacost(clf,m=10,n=100,r=2,
             ind = random.randint(0, len(X_train)-1)
             X.append(np.array(X_train[ind],dtype=float))
             Y.append(y_train[ind])
+        """
+        for ind in range(len(y_train)):
+            if y_train[ind] == 1:
+                X.append(np.array(X_train[ind],dtype=float))
+                Y.append(y_train[ind])
+        """
         data.append([X,Y])
 
     print("Training ...")
