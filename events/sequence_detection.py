@@ -292,10 +292,13 @@ classifiers = [
 def get_stats(events, corefs, afters, parents,X_train,y_train,IDS):
     number_of_events = sum([len(events[item]) for item in events])
     number_of_docs = len(events)
-
     number_of_afters = sum([len(afters[item]) for item in afters])
+    number_of_candidates = len(y_train)
+    number_of_positives = sum(y_train)
+    number_of_negatives = number_of_candidates - number_of_positives
 
     number_of_unique_events = 0
+
     for doc_id in events:
         number_of_unique_events += len(corefs[doc_id])
         for event_id in events[doc_id]:
@@ -304,6 +307,8 @@ def get_stats(events, corefs, afters, parents,X_train,y_train,IDS):
 
     print("There are %d number of events in %d documents" %(number_of_events,number_of_docs))
     print("There are %d number of unique events" %(number_of_unique_events))
+    print("There are %d candidates (%d/%d positive/negative)" %(number_of_candidates,
+                                                                number_of_positives, number_of_negatives))
     print("There are %d number of after links" %(number_of_afters))
 
 # filename = "data/LDC2016E130_training.tbf"
@@ -365,7 +370,9 @@ if __name__ == "__main__":
 
     parser = OptionParser()
     parser.add_option('-m','--main',default=False,action="store_true",help='')
+    parser.add_option('--metacost',default=False,action="store_true",help='')
     parser.add_option('-s','--statistics',default=False,action="store_true",help='')
+    parser.add_option('-o','--statsonly',default=False,action="store_true",help='')
     parser.add_option('-d','--debug',default=False,action="store_true",help='')
     #parser.add_option('-d','--debug',default=False,action="store_true",help='')
 
@@ -379,7 +386,13 @@ if __name__ == "__main__":
     #import ipdb ; ipdb.set_trace()
     if options.main:
         main()
+    elif options.metacost:
+        from metacost import metacost
+        metacost(classifiers[0])
     elif options.debug:
         main(debug=True)
+    elif options.statsonly:
+        for filename in ["data/LDC2016E130_training.tbf","data/LDC2016E130_test.tbf","data/Sequence_2017_test.tbf"]:
+            get_dataset(filename,stats=True,training=False)
     else:
         several_classifiers(stats=options.statistics)

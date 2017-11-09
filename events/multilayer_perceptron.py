@@ -58,10 +58,10 @@ def multilayer_perceptron(x,nol=2):
     layer_1 = tf.add(tf.matmul(x, weights['h1']), biases['b1'])
     # Hidden fully connected layer with 256 neurons
     layer_2 = tf.add(tf.matmul(layer_1, weights['h2']), biases['b2'])
-    # Output fully connected layer with a neuron for each class
     # Hidden fully connected layer with 256 neurons
     layer_3 = tf.add(tf.matmul(layer_2, weights['h3']), biases['b3'])
     latest_layer = layer_2 if nol == 2 else layer_3
+    # Output fully connected layer with a neuron for each class
     out_layer = tf.matmul(latest_layer, weights['out']) + biases['out']
     return out_layer
 
