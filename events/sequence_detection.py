@@ -3,6 +3,7 @@ from collections import defaultdict
 import datetime, os, numpy as np
 import logging, random
 from events.data_conf import PROJECT_FOLDER, realis_index
+from events.data_loader import get_dataset
 from optparse import OptionParser
 
 from sklearn.neighbors import KNeighborsClassifier
@@ -14,10 +15,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
-
 from sklearn.metrics import recall_score, precision_score, f1_score
 
-from data_loader import get_dataset
 
 # References:
 # http://scikit-learn.org/stable/auto_examples/classification/plot_classifier_comparison.html
