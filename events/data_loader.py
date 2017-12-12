@@ -14,8 +14,7 @@ def read_relations(line, events_doc, corefs_doc, afters_doc, parents_doc):
     elif line.startswith("@Subevent"):
         parents_doc[lid] = event_ids.split(",")
     else:
-        # print(line)
-        return
+        pass
 
 
 def add_corefs_to_single_events(events, corefs):
@@ -30,7 +29,7 @@ def add_corefs_to_single_events(events, corefs):
 
 # brat_conversion 1b386c986f9d06fd0a0dda70c3b8ade9 E194	145,154	sentences Justice_Sentence Actual
 def read_annotations(ann_file_tbf):
-    events, corefs, afters, parents = {},{},{},{}
+    events, corefs, afters, parents = {}, {}, {}, {}
     with open(ann_file_tbf) as ann_file:
         for line in ann_file:
             if line.startswith("#B"):
@@ -40,39 +39,42 @@ def read_annotations(ann_file_tbf):
                 afters[doc_id] = {}
                 parents[doc_id] = {}
             elif line.startswith("@"):
-                read_relations(line,events[doc_id], corefs[doc_id], afters[doc_id],parents[doc_id])
+                read_relations(line, events[doc_id], corefs[doc_id], afters[doc_id],parents[doc_id])
             elif line.startswith("b"):
                 _ , _, event_id, offsets, nugget, event_type, realis = line.strip().split("\t")
-                events[doc_id][event_id] = {"offsets":offsets,
-                                            "nugget":nugget,
-                                            "event_type":event_type,
-                                            "realis":realis}
-                #yield doc_id, event_id, offsets, nugget, event_type, realis
+                events[doc_id][event_id] = {"offsets": offsets,
+                                            "nugget": nugget,
+                                            "event_type": event_type,
+                                            "realis": realis}
             else:
                 pass
-    add_corefs_to_single_events(events,corefs)
-    return events, corefs, afters,parents
+    add_corefs_to_single_events(events, corefs)
+    return events, corefs, afters, parents
+##############################################################################
 
-def build_feature_vector(linked_events,events_doc,corefs_doc):
+
+def build_feature_vector(linked_events, events_doc, corefs_doc):
     x = [len(events_doc),len(corefs_doc),]
     for e_id in linked_events:
         nugget = events_doc.get(e_id).get('nugget')
         etype = events_doc.get(e_id).get('event_type')
         offsets = events_doc.get(e_id).get('offsets').split(",")
         realis = events_doc.get(e_id).get('realis')
-        #print("[%s]%s(%s)" %(e_id,nugget,etype))
         x.append(nugget)
         x.append(event_type_index[etype])
         x.extend([int(x) for x in offsets])
         x.append(realis_index[realis])
-    #add offset distance
-    [e1_id,e2_id] = linked_events
-    x.append(abs(int(events_doc.get(e1_id).get('offsets').split(",")[0])-int(events_doc.get(e2_id).get('offsets').split(",")[0])))
+    # add offset distance
+    [e1_id, e2_id] = linked_events
+    x.append(abs(int(events_doc.get(e1_id).get('offsets').split(",")[0]) -
+                 int(events_doc.get(e2_id).get('offsets').split(",")[0])))
     return x
 
-def get_coref_links(linked_event_ids,events_doc, corefs_doc,doc_id):
+
+def get_coref_links(linked_event_ids, events_doc, corefs_doc, doc_id):
     [from_event, to_event] = linked_event_ids
-    from_event_corefs, to_event_corefs = corefs_doc[events_doc[from_event]['coref']], corefs_doc[events_doc[to_event]['coref']]
+    from_event_corefs = corefs_doc[events_doc[from_event]['coref']]
+    to_event_corefs = corefs_doc[events_doc[to_event]['coref']]
     try:
         from_event_corefs.remove(from_event)
     except ValueError:
@@ -82,23 +84,23 @@ def get_coref_links(linked_event_ids,events_doc, corefs_doc,doc_id):
     while from_event_corefs:
         fro = from_event_corefs.pop()
         for to in to_event_corefs:
-            coref_links.append([fro,to])
-            coref_links_negatives.append([to,fro])
-    return coref_links,coref_links_negatives
+            coref_links.append([fro, to])
+            coref_links_negatives.append([to, fro])
+    return coref_links, coref_links_negatives
 
 
-# 'E211' : {'offsets': '1190,1196', 'nugget': 'merged', 'event_type': 'Business_Merge-Org', 'realis': 'Actual'}
-def build_feature_matrix_for_document(doc_id,events_doc, corefs_doc, afters_doc,training=True):
-    #print("%s\t%s\t%s\t%s" %(doc_id,len(events_doc),len(corefs_doc),len(afters_doc)))
-    #print(set(events_doc))
+# 'E211' : {'offsets': '1190,1196', 'nugget': 'merged',
+#           'event_type': 'Business_Merge-Org', 'realis': 'Actual'}
+def build_feature_matrix_for_document(doc_id, events_doc, corefs_doc,
+                                      afters_doc, training=True):
     X = []
-    Y=[]
+    Y = []
     IDS = []
     event_id_list = set(events_doc.keys())
-    coref_positives,negatives = [],[]
+    coref_positives, negatives = [], []
     for event_id in event_id_list:
         for to_event_id in event_id_list:
-            linked_event_ids = [event_id,to_event_id]
+            linked_event_ids = [event_id, to_event_id]
             is_positive = linked_event_ids in afters_doc.values()
             distance = abs(int(events_doc.get(event_id).get('offsets').split(",")[0]) - int(events_doc.get(to_event_id).get('offsets').split(",")[0]))
             # eliminate all pairs with a distance larger than 500 if not (in afters list and training)
@@ -235,11 +237,11 @@ def get_stats(events, corefs, afters, parents,X_train,y_train,IDS):
 
 
 # filename = "data/LDC2016E130_training.tbf"
-def get_dataset(filename,training=True,stats=False):
-    ann_file_tbf = os.path.join(PROJECT_FOLDER,filename)
-    events, corefs, afters,parents = read_annotations(ann_file_tbf)
-    X_train,y_train,IDS = build_feature_matrix_for_dataset(events, corefs, afters,parents,training=training)
+def get_dataset(filename, training=True, stats=False):
+    ann_file_tbf = os.path.join(PROJECT_FOLDER, filename)
+    events, corefs, afters, parents = read_annotations(ann_file_tbf)
+    X_train, y_train, IDS = build_feature_matrix_for_dataset(events, corefs, afters, parents,training=training)
     if stats:
-        get_stats(events, corefs, afters, parents,X_train,y_train,IDS )
+        get_stats(events, corefs, afters, parents, X_train, y_train, IDS)
     X_train = preprocess_dataset(X_train)
-    return X_train,y_train,IDS, events,corefs
+    return X_train, y_train, IDS, events, corefs

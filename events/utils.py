@@ -2,7 +2,7 @@ from collections import defaultdict
 import os, pickle, pprint, subprocess
 from prepare_datafile import Vocabulary, EmbeddingBank
 from data_conf import SEQUENCE_SOURCE_FOLDER, PROJECT_FOLDER
-from sequence_detection import read_annotations
+from data_loader import read_annotations
 
 def get_all_nuggets_from_folders():
     events_all = {}

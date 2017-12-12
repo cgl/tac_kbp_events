@@ -3,3 +3,4 @@ nltk
 gensim
 sklearn
 #pandas
+keras

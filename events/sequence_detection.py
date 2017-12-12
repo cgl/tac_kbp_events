@@ -32,49 +32,31 @@ python sequence_detection.py
 python2 ~/work/EvmEval/scorer_v1.8.py -a SEQUENCING -g /Users/cagil/work/tac_kbp_events/data/LDC2016E130_test.tbf -s /Users/cagil/work/tac_kbp_events/events/run1_results.txt
 """
 
-def write_results_tbf(events,afters,run_id = "run1"):
+
+def write_results_tbf(events, afters, run_id="run1"):
     results_str = []
     for doc_id in events.keys():
         results_str.append("#BeginOfDocument %s" %doc_id)
         for event_id in events[doc_id].keys():
             # put events
-            results_str.append("\t".join([run_id,doc_id,event_id,events[doc_id][event_id]["offsets"],
-                                               events[doc_id][event_id]["nugget"],
-                                               events[doc_id][event_id]["event_type"],
-                                               events[doc_id][event_id]["realis"]]))
+            results_str.append("\t".join([run_id, doc_id, event_id,
+                                          events[doc_id][event_id]["offsets"],
+                                          events[doc_id][event_id]["nugget"],
+                                          events[doc_id][event_id]["event_type"],
+                                          events[doc_id][event_id]["realis"]]))
             # put after links
-        for key1,key2 in afters[doc_id].values():
-            results_str.append("@After\tR11\t%s,%s" % (key1,key2))
-            #results = write_results_after_links_random(events, corefs, afters,parents)
+        for key1, key2 in afters[doc_id].values():
+            results_str.append("@After\tR11\t%s,%s" % (key1, key2))
+            # results = write_results_after_links_random(events, corefs, afters,parents)
         results_str.append("#EndOfDocument")
-    print("\n".join(results_str),file=open("results/%s_results.txt" %run_id,"w"))
-    #import ipdb ; ipdb.set_trace()
+    print("\n".join(results_str), file=open("results/%s_results.txt" %run_id, "w"))
 
-def write_results_after_links_random(events, corefs, afters,parents):
-        for a in range(1,4):
-            try:
-                key1 = random.choice(list(events[doc_id].keys()))
-                events[doc_id].pop(key1)
-                key2 = random.choice(list(events[doc_id].keys()))
-                results_str.append("@After\tR11\t%s,%s" % (key1,key2))
-            except:
-                pass
-
-
-def main(debug=False):
-    ann_file_tbf = os.path.join(PROJECT_FOLDER,"data/LDC2016E130_test.tbf")
-    if debug:
-        import ipdb ; ipdb.set_trace()
-    events, corefs, afters, parents = read_annotations(ann_file_tbf)
-    get_results(events, corefs, afters,parents)
-    #for line in events:
-    #    print(line)
 
 names = ["Nearest Neighbors",
          "Gaussian Process",
          "Decision Tree", "Random Forest", "Neural Net", "AdaBoost",
          "Naive Bayes", "QDA",
-         "Linear SVM","RBF SVM"]
+         "Linear SVM", "RBF SVM"]
 classifiers = [
     KNeighborsClassifier(3),
     GaussianProcessClassifier(1.0 * RBF(1.0), warm_start=True),
@@ -99,7 +81,7 @@ def after_links_as_dictionary(y_pred,IDS_test,events,corefs):
         if old_doc_id != doc_id:
             pairs = defaultdict(set)
         try:
-            from_event, to_event = IDS_test[ind][1],IDS_test[ind][2]
+            from_event, to_event = IDS_test[ind][1], IDS_test[ind][2]
             from_event_corefs = corefs[doc_id][events[doc_id][from_event]['coref']]
             to_event_corefs = corefs[doc_id][events[doc_id][to_event]['coref']]
             from_event_coref = from_event_corefs[0] if from_event_corefs else from_event
@@ -116,51 +98,69 @@ def after_links_as_dictionary(y_pred,IDS_test,events,corefs):
     print("Number of links after cyclic cleanup %d" %len(afters_pred))
     return afters_pred
 
-def post_process_predictions(y_pred,IDS_test,events,corefs,name):
-    afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events,corefs)
+
+def post_process_predictions(y_pred, IDS_test, events, corefs, name):
+    afters_pred = after_links_as_dictionary(y_pred, IDS_test, events, corefs)
     timestamp = datetime.datetime.now().strftime("%m%d-%H%M%S")
-    write_results_tbf(events, afters_pred,run_id="%s-%s" %(name.replace(" ","-"),timestamp))
+    write_results_tbf(events, afters_pred,
+                      run_id="%s-%s" % (name.replace(" ", "-"), timestamp))
+
 
 def several_classifiers(stats=False):
-    X_train,y_train,IDS,_,_ = get_dataset("data/LDC2016E130_training.tbf",stats=stats,training=True)
-    X_test,y_test,IDS_test,events,corefs = get_dataset("data/LDC2016E130_test.tbf",stats=stats,training=False)
-    #print(neigh.predict(X[0:10]))    #print(neigh.predict_proba(X[0:10]))    #score = clf.score(X_test, y_test)
+    X_train, y_train, IDS, _, _ = get_dataset("data/LDC2016E130_training.tbf", stats=stats, training=True)
+    X_test, y_test, IDS_test, events, corefs = get_dataset("data/LDC2016E130_test.tbf", stats=stats, training=False)
+    # print(neigh.predict(X[0:10]))    #print(neigh.predict_proba(X[0:10]))    #score = clf.score(X_test, y_test)
     print("Training ...")
     # iterate over classifiers
     for name, clf in zip(names, classifiers):
         clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
-        post_process_predictions(y_pred,IDS_test,events,corefs,name)
-        precision,recall,f1 = precision_score(y_test,y_pred), recall_score(y_test,y_pred), f1_score(y_test,y_pred)
-        print("%s: %.4f %.4f %.4f" %(name,precision,recall,f1))
+        post_process_predictions(y_pred, IDS_test, events, corefs, name)
+        precision, recall, f1 = precision_score(y_test, y_pred), recall_score(y_test, y_pred), f1_score(y_test, y_pred)
+        print("%s: %.4f %.4f %.4f" %(name, precision, recall, f1))
+
+
+def sequence_cnn(stats=False):
+    import pickle
+    prep = pickle.load(open("prep", "rb"))
+    from keras.models import load_model
+    model = load_model('mymodel.h5')
+    X_test, y_test, IDS_test, events, corefs = get_dataset("data/LDC2016E130_test.tbf", stats=stats, training=False)
+    y_pred_prob = model.predict(prep.x_test)
+    y_pred = [np.argmax(pred) for pred in y_pred_prob]
+    y_test = [np.argmax(y) for y in prep.y_test]
+
+    post_process_predictions(y_pred, IDS_test, events, corefs, "cnn")
+    precision, recall, f1 = precision_score(y_test, y_pred), recall_score(y_test, y_pred), f1_score(y_test, y_pred)
+    print("%s: %.4f %.4f %.4f" %("cnn", precision, recall, f1))
+
 
 if __name__ == "__main__":
 
     parser = OptionParser()
-    parser.add_option('-m','--main',default=False,action="store_true",help='')
-    parser.add_option('--metacost',default=False,action="store_true",help='')
-    parser.add_option('-s','--statistics',default=False,action="store_true",help='')
-    parser.add_option('-o','--statsonly',default=False,action="store_true",help='')
-    parser.add_option('-d','--debug',default=False,action="store_true",help='')
-    #parser.add_option('-d','--debug',default=False,action="store_true",help='')
+
+    parser.add_option('--metacost', default=False, action="store_true", help='')
+    parser.add_option('-c', '--cnn', default=False, action="store_true", help='')
+    parser.add_option('-s', '--statistics', default=False, action="store_true", help='')
+    parser.add_option('-o', '--statsonly', default=False, action="store_true", help='')
+    parser.add_option('-d', '--debug', default=False, action="store_true", help='')
+    #parser.add_option('-d', '--debug', default=False, action="store_true", help='')
 
     parser.add_option("-f", "--file", dest="filename",
                       help="write report to FILE", metavar="FILE")
     parser.add_option("-q", "--quiet",
                       action="store_false", dest="verbose", default=True,
-                      help="don't print status messages to stdout")
-    parser.add_option('--import_event',default=None,type=int,metavar='FB_ID',help='')
+                      help="donß't print status messages to stdout")
+    parser.add_option('--import_event', default=None, type=int, metavar='FB_ID')
     (options, args) = parser.parse_args()
-    #import ipdb ; ipdb.set_trace()
-    if options.main:
-        main()
-    elif options.metacost:
+    if options.metacost:
         from metacost import metacost
         metacost(classifiers[0])
-    elif options.debug:
-        main(debug=True)
     elif options.statsonly:
-        for filename in ["data/LDC2016E130_training.tbf","data/LDC2016E130_test.tbf","data/Sequence_2017_test.tbf"]:
-            get_dataset(filename,stats=True,training=False)
+        for filename in ["data/LDC2016E130_training.tbf",
+                         "data/LDC2016E130_test.tbf", "data/Sequence_2017_test.tbf"]:
+            get_dataset(filename, stats=True, training=False)
+    elif options.cnn:
+        sequence_cnn()
     else:
         several_classifiers(stats=options.statistics)

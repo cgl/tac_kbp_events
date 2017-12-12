@@ -7,14 +7,15 @@ from keras.models import Sequential
 import matplotlib.pylab as plt
 
 batch_size = 128
-num_classes = 10
+num_classes = 2
 epochs = 10
 
 # input image dimensions
-img_x, img_y = 28, 28
+img_x, img_y = 10, 300
 
 # load the MNIST data set, which already splits into train and test sets for us
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
+import ipdb ; ipdb.set_trace()
 
 # reshape the data into a 4D tensor - (sample_number, x_img_size, y_img_size, num_channels)
 # because the MNIST is greyscale, we only have a single channel - RGB colour images would have 3
@@ -25,8 +26,6 @@ input_shape = (img_x, img_y, 1)
 # convert the data to the right type
 x_train = x_train.astype('float32')
 x_test = x_test.astype('float32')
-x_train /= 255
-x_test /= 255
 print('x_train shape:', x_train.shape)
 print(x_train.shape[0], 'train samples')
 print(x_test.shape[0], 'test samples')

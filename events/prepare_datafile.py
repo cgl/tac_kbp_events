@@ -1,8 +1,8 @@
-import logging,os,sys,pickle,random
+import logging, os, sys, pickle, random
 import numpy as np
 from xml.etree import ElementTree
 from data_conf import *
-#check the python version to Get User Input From the Command Line
+# check the python version to Get User Input From the Command Line
 from sys import version_info
 from nltk import word_tokenize, sent_tokenize
 from collections import defaultdict
@@ -10,9 +10,10 @@ py3 = version_info[0] > 2 #creates boolean value for test that Python major vers
 if not py3:
     input = raw_input
 
+
 # source: https://github.com/anoperson/jointEE-NN/blob/master/jee_processData.py#L353
 # '../data/GoogleNews-vectors-negative300.bin'
-def load_bin_vec(vocab,fname='/datasets/GoogleNews-vectors-negative300.bin'):
+def load_bin_vec(vocab, fname='/datasets/GoogleNews-vectors-negative300.bin'):
     """
     Loads 300x1 word vecs from Google (Mikolov) word2vec
     """
@@ -28,6 +29,7 @@ def load_bin_vec(vocab,fname='/datasets/GoogleNews-vectors-negative300.bin'):
             logging.warning(e)
     print('dim: ', dim)
     return dim, word_vecs
+
 
 # source: https://github.com/anoperson/jointEE-NN/blob/master/jee_processData.py#L338
 def get_W(word_vecs, k=300):
@@ -45,14 +47,17 @@ def get_W(word_vecs, k=300):
         i += 1
     return W, word_idx_map
 
+
 def spans(txt):
-    tokens=word_tokenize(txt)
+    tokens = word_tokenize(txt)
     offset = 0
     for token in tokens:
         if token not in ["''",'``']:
             offset = txt.find(token, offset)
             yield token, offset, offset+len(token)
             offset += len(token)
+
+
 import source_parser as html_parser
 def get_all_text_from_folders(folder_list):
     my_parser = html_parser.MyHTMLParser()
@@ -60,15 +65,17 @@ def get_all_text_from_folders(folder_list):
         list_dir = os.listdir(folder)
         for filename in list_dir:
             if filename.endswith("txt"):
-                with open(os.path.join(folder,filename)) as sourcefile:
+                with open(os.path.join(folder, filename)) as sourcefile:
                     source = sourcefile.read()
                     my_parser.feed(source)
     return my_parser.get_text()
+
 
 def tokenize_with_span(source_str):
     for token in spans(source_str):
         yield token
         assert token[0]==source_str[token[1]:token[2]]
+
 
 class Vocabulary(object):
     vocab_dict = defaultdict(float)
@@ -362,7 +369,7 @@ def initialize(): # todo delete
     """
     Creates datafile and vocab file
     """
-    file_index=0
+    file_index = 0
     list_dir = os.listdir(SOURCE_FOLDER)
 
     while file_index < len(list_dir):
@@ -381,9 +388,9 @@ def initialize(): # todo delete
     embeddings['word'] = W1
     """
     #print vocabulary to file
-    with open(VOCABFILE,"w") as v_file:
-      for key, value in vocab.items():
-        v_file.write("%s\t%s\n" % (key,value))
+    with open(VOCABFILE, "w") as v_file:
+        for key, value in vocab.items():
+            v_file.write("%s\t%s\n" % (key, value))
 
 
 if __name__ == "__main__":
@@ -394,5 +401,5 @@ if __name__ == "__main__":
     response = input("Do you want to list folder content? [y/N]: ")
     if response is "y":
         sys.stdout.write("From the above files,")
-        print("".join(["%d. %s" %(ind,filename) for ind,filename in enumerate(list_dir)]))
+        print("".join(["%d. %s" %(ind, filename) for ind,filename in enumerate(list_dir)]))
     initialize()
