@@ -1,5 +1,5 @@
 import os
-from data_conf import PROJECT_FOLDER, event_type_index, realis_index
+from events.data_conf import PROJECT_FOLDER, event_type_index, realis_index
 import numpy as np
 
 
