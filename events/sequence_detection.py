@@ -2,7 +2,7 @@ from collections import defaultdict
 
 import datetime, os, numpy as np
 import logging, random
-from data_conf import PROJECT_FOLDER, realis_index
+from events.data_conf import PROJECT_FOLDER, realis_index
 from optparse import OptionParser
 
 from sklearn.neighbors import KNeighborsClassifier
