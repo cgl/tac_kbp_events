@@ -46,8 +46,9 @@ def write_results_tbf(events, afters, corefs, parents, run_id="run1"):
             # put after links
         for key1, key2 in afters[doc_id].values():
             results_str.append("@After\tR11\t%s,%s" % (key1, key2))
-        for key1, key2 in corefs[doc_id].values():
-            results_str.append("@Coreference\tC11\t%s,%s" % (key1, key2))
+        for keys in corefs[doc_id].values():
+            if len(keys) > 1:
+                results_str.append("@Coreference\tC11\t%s" % ",".join(keys))
         for key1, key2 in parents[doc_id].values():
             results_str.append("@Subevent\tR12\t%s,%s" % (key1, key2))
             # results = write_results_after_links_random(events, corefs, afters,parents)
