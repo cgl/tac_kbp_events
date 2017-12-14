@@ -124,9 +124,9 @@ def run(X_train,y_train,X_test,y_test,name):
         print("Accuracy:", val_accuracy)
         print("Results:%s\t%s\t%s\n" %(precision,recall,f1))
 
-        afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events,corefs)
+        afters_pred =  after_links_as_dictionary(y_pred,IDS_test,events,corefs
         timestamp = datetime.datetime.now().strftime("%m%d-%H%M")
-        write_results_tbf(events, afters_pred,run_id="%s-%s-%s" %("Mlp-3Layer",name,timestamp))
+        write_results_tbf(events, afters_pred, corefs, parents, run_id="%s-%s-%s" %("Mlp-3Layer",name,timestamp))
 
         ############
 parser = OptionParser()

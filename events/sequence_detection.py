@@ -32,10 +32,10 @@ python2 ~/work/EvmEval/scorer_v1.8.py -a SEQUENCING -g /Users/cagil/work/tac_kbp
 """
 
 
-def write_results_tbf(events, afters, run_id="run1"):
+def write_results_tbf(events, afters, corefs, parents, run_id="run1"):
     results_str = []
     for doc_id in events.keys():
-        results_str.append("#BeginOfDocument %s" %doc_id)
+        results_str.append("#BeginOfDocument %s" % doc_id)
         for event_id in events[doc_id].keys():
             # put events
             results_str.append("\t".join([run_id, doc_id, event_id,
@@ -46,9 +46,13 @@ def write_results_tbf(events, afters, run_id="run1"):
             # put after links
         for key1, key2 in afters[doc_id].values():
             results_str.append("@After\tR11\t%s,%s" % (key1, key2))
+        for key1, key2 in corefs[doc_id].values():
+            results_str.append("@Coreference\tC11\t%s,%s" % (key1, key2))
+        for key1, key2 in parents[doc_id].values():
+            results_str.append("@Subevent\tR12\t%s,%s" % (key1, key2))
             # results = write_results_after_links_random(events, corefs, afters,parents)
         results_str.append("#EndOfDocument")
-    print("\n".join(results_str), file=open("results/%s_results.txt" %run_id, "w"))
+    print("\n".join(results_str), file=open("results/%s_results.txt" % run_id, "w"))
 
 
 names = ["Nearest Neighbors",
@@ -98,23 +102,23 @@ def after_links_as_dictionary(y_pred,IDS_test,events,corefs):
     return afters_pred
 
 
-def post_process_predictions(y_pred, IDS_test, events, corefs, name):
+def post_process_predictions(y_pred, IDS_test, events, corefs, parents, name):
     afters_pred = after_links_as_dictionary(y_pred, IDS_test, events, corefs)
     timestamp = datetime.datetime.now().strftime("%m%d-%H%M%S")
-    write_results_tbf(events, afters_pred,
+    write_results_tbf(events, afters_pred, corefs, parents,
                       run_id="%s-%s" % (name.replace(" ", "-"), timestamp))
 
 
 def several_classifiers(stats=False):
-    X_train, y_train, IDS, _, _ = get_dataset("data/LDC2016E130_training.tbf", stats=stats, training=True)
-    X_test, y_test, IDS_test, events, corefs = get_dataset("data/LDC2016E130_test.tbf", stats=stats, training=False)
+    X_train, y_train, IDS, _, _, _ = get_dataset("data/LDC2016E130_training.tbf", stats=stats, training=True)
+    X_test, y_test, IDS_test, events, corefs, parents = get_dataset("data/LDC2016E130_test.tbf", stats=stats, training=False)
     # print(neigh.predict(X[0:10]))    #print(neigh.predict_proba(X[0:10]))    #score = clf.score(X_test, y_test)
     print("Training ...")
     # iterate over classifiers
     for name, clf in zip(names, classifiers):
         clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
-        post_process_predictions(y_pred, IDS_test, events, corefs, name)
+        post_process_predictions(y_pred, IDS_test, events, corefs, parents, name)
         precision, recall, f1 = precision_score(y_test, y_pred), recall_score(y_test, y_pred), f1_score(y_test, y_pred)
         print("%s: %.4f %.4f %.4f" %(name, precision, recall, f1))
 
@@ -124,7 +128,7 @@ def sequence_cnn(stats=False):
     prep = pickle.load(open("prep", "rb"))
     from keras.models import load_model
     model = load_model('mymodel.h5')
-    X_test, y_test, IDS_test, events, corefs = get_dataset("data/LDC2016E130_test.tbf", stats=stats, training=False)
+    X_test, y_test, IDS_test, events, corefs, parents = get_dataset("data/LDC2016E130_test.tbf", stats=stats, training=False)
     y_pred_prob = model.predict(prep.x_test)
     y_pred = [np.argmax(pred) for pred in y_pred_prob]
     y_test = [np.argmax(y) for y in prep.y_test]

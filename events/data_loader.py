@@ -244,4 +244,4 @@ def get_dataset(filename, training=True, stats=False):
     if stats:
         get_stats(events, corefs, afters, parents, X_train, y_train, IDS)
     X_train = preprocess_dataset(X_train)
-    return X_train, y_train, IDS, events, corefs
+    return X_train, y_train, IDS, events, corefs, parents
