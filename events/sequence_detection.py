@@ -53,7 +53,9 @@ def write_results_tbf(events, afters, corefs, parents, run_id="run1"):
             results_str.append("@Subevent\tR12\t%s,%s" % (key1, key2))
             # results = write_results_after_links_random(events, corefs, afters,parents)
         results_str.append("#EndOfDocument")
-    print("\n".join(results_str), file=open("results/%s_results.txt" % run_id, "w"))
+    filename = "results/%s_results.txt" % run_id
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    print("\n".join(results_str), file=open(filename, "w"))
 
 
 names = ["Nearest Neighbors",
